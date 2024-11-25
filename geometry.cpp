@@ -147,6 +147,10 @@ void Edge::add_polygon(QUuid polygon_id) {
     polygons.push_back(polygon_id);
 }
 
+int Edge::get_property() {
+    return property;
+}
+
 //эта штука сейчас не нужна, мб потом пригодится
 void Edge::remove_polygon(QUuid polygon_id) {
     for (size_t i = 0; i < polygons.size(); i++) {
@@ -158,9 +162,13 @@ void Edge::remove_polygon(QUuid polygon_id) {
 }
 
 Polygon::Polygon(std::vector<QUuid> &vertices, std::vector<QUuid> &edges, std::string name,
-                 int material) : name(name), edges(edges), vertices(vertices), material(material) {
-    QUuid id = generator_id_polygon();
-    this->id = id;
+                 int material, int existingNumber, QUuid existingId) : name(name), edges(edges), vertices(vertices), material(material),
+    cur_polygon_number(existingNumber) {
+    if (existingId.isNull()){
+        id = generator_id_polygon();
+    } else {
+        id = existingId;
+    }
     all_polygons[id] = *this;
 
     for (int i = 0; i < edges.size(); ++i) {
@@ -170,8 +178,9 @@ Polygon::Polygon(std::vector<QUuid> &vertices, std::vector<QUuid> &edges, std::s
     for (int i = 0; i < vertices.size(); ++i) {
         all_vertices[vertices[i]].add_polygon(id);
     }
-
-    polygon_number++;
+    // this->cur_polygon_number = existingNumber;
+    total_polygon_number++;
+    // }
 }
 
 QUuid Polygon::get_id() {
@@ -182,8 +191,12 @@ std::string Polygon::get_name() {
     return name;
 }
 
-int Polygon::get_polygon_number() {
-    return polygon_number;
+int Polygon::get_polygons_total() {
+    return total_polygon_number;
+}
+
+int Polygon::get_number(){
+    return cur_polygon_number;
 }
 
 

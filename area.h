@@ -2,6 +2,8 @@
 #define AREA_H
 
 #include <QWidget>
+#include "geometry.h"
+#include <QMouseEvent>
 
 class Mediator : public QObject {
     Q_OBJECT
@@ -12,7 +14,9 @@ public:
     }
 
 signals:
-    void bufferConnect(QVector<QVector2D>* data);
+    void bufferConnect(QVector<QVector2D>* data, Polygon* editedP);
+    void polygonSelect(Polygon* polygon);
+    void polygonAdd(Polygon* polygon);
 private:
     Mediator() {}
 };
@@ -24,11 +28,13 @@ class Area : public QWidget
 public:
     explicit Area(QWidget *parent = nullptr);
 protected:
-    void paintEvent(QPaintEvent* event);
+    void paintEvent(QPaintEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
 private slots:
-    void onBufferConnectReceived(QVector<QVector2D>* data);
+    void onBufferConnectReceived(QVector<QVector2D>* data, Polygon* editedP);
 private:
     QVector<QVector2D>* bufferData = nullptr;
+    Polygon* edited;
 };
 
 #endif // AREA_H

@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QVector2D>
 #include <QPointF>
+#include <QMouseEvent>
 #include "geometry.h"
 
 Area::Area(QWidget *parent)
@@ -26,6 +27,9 @@ void Area::paintEvent(QPaintEvent* event) {
     painter.setBrush(Qt::black);
     painter.setPen(Qt::black);
     for (auto& [id, polygon] : all_polygons) {
+        if (edited == &polygon) {
+            continue;
+        }
         std::vector<QUuid>& vertices = polygon.get_vertices();
         qWarning() << vertices.size();
         for (int i = 0; i < vertices.size(); ++i) {
@@ -59,10 +63,20 @@ void Area::paintEvent(QPaintEvent* event) {
     painter.end();
 }
 
-void Area::onBufferConnectReceived(QVector<QVector2D>* data) {
+void Area::mousePressEvent(QMouseEvent* event) {
+    auto pos = mapFromGlobal(event->globalPosition().toPoint());
+    auto candidates = find_polygons_by_point(pos.x(), pos.y());
+    if (candidates.size() == 0) {
+        return;
+    }
+    emit Mediator::instance()->polygonSelect(&all_polygons[candidates.back()]);
+}
+
+void Area::onBufferConnectReceived(QVector<QVector2D>* data, Polygon* editedP) {
     if (bufferData == nullptr) {
         bufferData = data;
     }
+    edited = editedP;
     repaint();
     // qWarning() << "signal";
 }

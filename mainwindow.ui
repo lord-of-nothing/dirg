@@ -26,7 +26,7 @@
   </widget>
   <widget class="QDockWidget" name="treeDock">
    <property name="styleSheet">
-    <string notr="true">background-color: yellow;</string>
+    <string notr="true"/>
    </property>
    <property name="allowedAreas">
     <set>Qt::DockWidgetArea::LeftDockWidgetArea</set>
@@ -34,7 +34,32 @@
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents"/>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QPushButton" name="newPolygonBtn">
+       <property name="text">
+        <string>New polygon</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTreeWidget" name="tree">
+       <property name="editTriggers">
+        <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+       </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
+       <column>
+        <property name="text">
+         <string notr="true">1</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QDockWidget" name="editorDock">
    <property name="allowedAreas">

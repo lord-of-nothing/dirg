@@ -66,6 +66,8 @@ public:
 
     void remove_polygon(QUuid polygon_id);
 
+    int get_property();
+
 private:
     int property;
     QUuid id;
@@ -79,7 +81,8 @@ inline std::map<QUuid, Edge> all_edges;
 class Polygon {
 public:
     Polygon() = default;
-    Polygon(std::vector<QUuid> &vertices, std::vector<QUuid> &edges, std::string name, int material);
+    Polygon(std::vector<QUuid> &vertices, std::vector<QUuid> &edges, std::string name, int material,
+            int existingNumber = -1, QUuid existingId = QUuid());
 
     QUuid generator_id_polygon();
 
@@ -101,10 +104,12 @@ public:
 
     void delete_polygon();
 
-    static int get_polygon_number();
+    static int get_polygons_total();
+    int get_number();
 
 private:
-    inline static int polygon_number = 0;
+    inline static int total_polygon_number = 0;
+    int cur_polygon_number;
     QUuid id;
     std::string name;
     std::vector<QUuid> edges;

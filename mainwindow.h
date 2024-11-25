@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "editor.h"
+#include "area.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -16,10 +16,13 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
+    void addPolygon(Polygon* polygon);
+    void removePolygon(QUuid id);
     ~MainWindow();
-
 private:
     Ui::MainWindow *ui;
+    void newPolygon();
+    void selectPolygon(QUuid id);
     // Editor editor;
 
 };

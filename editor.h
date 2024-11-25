@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QVector2D>
 #include <QDockWidget>
+#include "geometry.h"
+#include "mainwindow.h"
 
 namespace Ui {
 class Editor;
@@ -18,7 +20,9 @@ class Editor : public QWidget
 
 public:
     explicit Editor(QWidget *parent = nullptr);
-    void setupNew();
+    // void setupNew();
+    void setupExistingPolygon(Polygon* polygon);
+    void resetEditor();
     ~Editor();
 
 protected:
@@ -27,17 +31,18 @@ protected:
 
 private slots:
     void onBufferConnect();
+    void onPolygonSelectReceived(Polygon* polygon);
 
 private:
     void updateTableSize();
     void addVertex();
+    void addVertexRow(int row, QString vName, double x, double y);
     void saveVertex(int row);
     void resetVertex(int row);
     void finishEditVertex(int row);
     void editVertex(int row);
     void clearNew();
     void savePolygon();
-    void resetEditor();
 
     Ui::Editor *ui;
     QTableWidget* vtable;
@@ -45,7 +50,9 @@ private:
     QTableWidget* etable;
     QVector<QVector2D> buffer;
     QDockWidget* dock;
+    MainWindow* mainWindow;
     int polygonNumber;
+    Polygon* editedPolygon = nullptr;
 
     const double minCoord = 0.0;
     const double maxCoord = 1000.0;
