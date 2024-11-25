@@ -1,48 +1,50 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef GEOMETRY_H
+#define GEOMETRY_H
+
 #include <string>
 #include <vector>
 #include <map>
-#include <uuid/uuid.h>
+#include <QUuid>
+
 class Vertex {
 public:
     Vertex() = default;
     Vertex(double x, double y, std::string &name);
 
-    std::string generator_id_vertex();
+    QUuid generator_id_vertex();
 
     double get_x();
 
     double get_y();
 
-    std::string get_id();
+    QUuid get_id();
 
     std::string get_name();
 
-    std::vector<std::string> &get_edges();
+    std::vector<QUuid> &get_edges();
 
-    std::vector<std::string> &get_polygons();
+    std::vector<QUuid> &get_polygons();
 
-    void add_edge(std::string edge_id);
+    void add_edge(QUuid edge_id);
 
-    void remove_edge(std::string edge_id);
+    void remove_edge(QUuid edge_id);
 
-    void add_polygon(std::string polygon_id);
+    void add_polygon(QUuid polygon_id);
 
-    void remove_polygon(std::string polygon_id);
+    void remove_polygon(QUuid polygon_id);
 
     // void delete_vertex();
 
 private:
     double x;
     double y;
-    std::string id;
+    QUuid id;
     std::string name;
-    std::vector<std::string> polygons;
-    std::vector<std::string> edges;
+    std::vector<QUuid> polygons;
+    std::vector<QUuid> edges;
 };
 
-inline std::map<std::string, Vertex> all_vertices;
+inline std::map<QUuid, Vertex> all_vertices;
 inline Vertex shite;
 
 class Edge {
@@ -50,52 +52,52 @@ public:
     Edge() = default;
     Edge(Vertex &start, Vertex &finish, std::string &name, int property);
 
-    std::string generator_id_edge();
+    QUuid generator_id_edge();
 
-    std::string get_id();
+    QUuid get_id();
 
     std::string get_name();
 
-    std::vector<std::string> &get_polygons();
+    std::vector<QUuid> &get_polygons();
 
     std::pair<Vertex &, Vertex &> get_coords();
 
-    void add_polygon(std::string polygon_id);
+    void add_polygon(QUuid polygon_id);
 
-    void remove_polygon(std::string polygon_id);
+    void remove_polygon(QUuid polygon_id);
 
 private:
     int property;
-    std::string id;
+    QUuid id;
     std::pair<Vertex &, Vertex &> coords{shite, shite};
     std::string name;
-    std::vector<std::string> polygons;
+    std::vector<QUuid> polygons;
 };
 
-inline std::map<std::string, Edge> all_edges;
+inline std::map<QUuid, Edge> all_edges;
 
 class Polygon {
 public:
     Polygon() = default;
-    Polygon(std::vector<std::string> &vertices, std::vector<std::string> &edges, std::string &name, int material);
+    Polygon(std::vector<QUuid> &vertices, std::vector<QUuid> &edges, std::string &name, int material);
 
-    std::string generator_id_polygon();
+    QUuid generator_id_polygon();
 
-    std::string get_id();
+    QUuid get_id();
 
     std::string get_name();
 
-    std::vector<std::string> &get_vertices();
+    std::vector<QUuid> &get_vertices();
 
-    std::vector<std::string> &get_edges();
+    std::vector<QUuid> &get_edges();
 
-    std::string next_vertex(std::string current_vertex);
+    QUuid next_vertex(QUuid current_vertex);
 
-    std::string next_edge(std::string current_edge);
+    QUuid next_edge(QUuid current_edge);
 
-    std::string previous_edge(std::string current_edge);
+    QUuid previous_edge(QUuid current_edge);
 
-    std::string previous_vertex(std::string current_vertex);
+    QUuid previous_vertex(QUuid current_vertex);
 
     void delete_polygon();
 
@@ -103,13 +105,21 @@ public:
 
 private:
     int polygon_number = 0;
-    std::string id;
+    QUuid id;
     std::string name;
-    std::vector<std::string> edges;
-    std::vector<std::string> vertices;
+    std::vector<QUuid> edges;
+    std::vector<QUuid> vertices;
     int material;
 };
 
-inline std::map<std::string, Polygon> all_polygons;
+inline std::map<QUuid, Polygon> all_polygons;
 
-#endif //MAINWINDOW_H
+bool check_new_point(double first_x, double first_y, double second_x, double second_y, double third_x, double third_y);
+bool check_convex(double first_x, double first_y, double second_x, double second_y, double third_x, double third_y);
+double area(double first_x, double first_y, double second_x, double second_y, double third_x, double third_y);
+bool intersect(double a, double b, double c, double d);
+bool check_intersect(double first_x, double first_y, double second_x, double second_y, double third_x, double third_y, double fourth_x, double fourth_y);
+bool point_in_polygon(double x, double y, QUuid polygon_id);
+std::vector<QUuid> find_polygons_by_point(double x, double y);
+
+#endif // GEOMETRY_H

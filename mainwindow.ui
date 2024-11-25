@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QWidget" name="paintArea" native="true">
+     <widget class="Area" name="paintArea" native="true">
       <property name="styleSheet">
        <string notr="true">background-color: pink</string>
       </property>
@@ -46,6 +46,14 @@
    <widget class="QWidget" name="dockWidgetContents_2"/>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Area</class>
+   <extends>QWidget</extends>
+   <header>../../../../area.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -7,6 +7,8 @@
 #include <QVector>
 #include <QComboBox>
 
+#include "area.h"
+
 QVector<QString> materials{"1", "2", "3"};
 
 Editor::Editor(QWidget *parent)
@@ -27,7 +29,6 @@ Editor::Editor(QWidget *parent)
    }
 
 void Editor::setupNew() {
-    // vertex table
     vtable->insertRow(0);
     QLineEdit* nameEdit = new QLineEdit(this);
     nameEdit->setPlaceholderText("Name");
@@ -45,7 +46,9 @@ void Editor::setupNew() {
 
     QPushButton* addBtn = new QPushButton("+", this);
     connect(addBtn, &QPushButton::released, this, &Editor::addVertex);
+    connect(addBtn, &QPushButton::released, this, &Editor::onBufferConnect);
     vtable->setCellWidget(0, 3, addBtn);
+
 }
 
 void Editor::addVertex() {
@@ -82,6 +85,7 @@ void Editor::addVertex() {
     connect(editBtn, &QPushButton::released, this, [this, row](){editVertex(row);});
     QPushButton* saveBtn = new QPushButton("s", this);
     connect(saveBtn, &QPushButton::released, this, [this, row](){saveVertex(row);});
+    connect(saveBtn, &QPushButton::released, this, &Editor::onBufferConnect);
 
     QWidget* editSaveStackW = new QWidget(this);
     QStackedLayout* editSaveStack = new QStackedLayout(editSaveStackW);
@@ -99,15 +103,17 @@ void Editor::addVertex() {
     QComboBox* materialCombo = new QComboBox(this);
     materialCombo->addItems(materials);
     etable->setCellWidget(row, 1, materialCombo);
+
+    // buffer
+    buffer.append(QVector2D(xEdit->value(), yEdit->value()));
 }
 
 void Editor::editVertex(int row) {
     for (int i = 0; i < 3; ++i) {
         vtable->cellWidget(row, i)->setEnabled(true);
     }
-    // vtable->cellWidget(row, 4)->show();
     cancelBtn = new QPushButton("x", this);
-    connect(cancelBtn, &QPushButton::released, this, [this, row](){finishEditVertex(row);});
+    connect(cancelBtn, &QPushButton::released, this, [this, row](){resetVertex(row);});
     vtable->setCellWidget(row, 4, cancelBtn);
 
     QStackedLayout* layout = qobject_cast<QStackedLayout*>(vtable->cellWidget(row, 3)->layout());
@@ -122,13 +128,26 @@ void Editor::editVertex(int row) {
 
 void Editor::saveVertex(int row) {
     finishEditVertex(row);
+
+    double x = qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 1))->value();
+    double y = qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 2))->value();
+
+    buffer[row] = QVector2D(x, y);
+}
+
+void Editor::resetVertex(int row) {
+    finishEditVertex(row);
+
+    QDoubleSpinBox* xEdit = qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 1));
+    xEdit->setValue(buffer[row][0]);
+    QDoubleSpinBox* yEdit = qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 2));
+    yEdit->setValue(buffer[row][1]);
 }
 
 void Editor::finishEditVertex(int row) {
     for (int i = 0; i < 3; ++i) {
         vtable->cellWidget(row, i)->setEnabled(false);
     }
-    // vtable->cellWidget(row, 4)->hide();
     vtable->removeCellWidget(row, 4);
     delete cancelBtn;
     cancelBtn = nullptr;
@@ -137,7 +156,6 @@ void Editor::finishEditVertex(int row) {
     for (int i = 0; i < vtable->rowCount(); ++i) {
         vtable->cellWidget(i, 3)->setEnabled(true);
     }
-
 }
 
 void Editor::clearNew() {
@@ -169,6 +187,11 @@ void Editor::showEvent(QShowEvent *event) {
 
 void Editor::resizeEvent(QResizeEvent *event) {
     updateTableSize();
+}
+
+void Editor::onBufferConnect() {
+    emit Mediator::instance()->bufferConnect(&buffer);
+    // qWarning() << "sent";
 }
 
 Editor::~Editor()

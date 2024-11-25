@@ -26,6 +26,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         editor.h editor.cpp editor.ui
         geometry.cpp
         geometry.h
+        area.h area.cpp
+
 
     )
 # Define target properties for Android with Qt 6 as:
