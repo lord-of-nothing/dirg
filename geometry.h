@@ -45,12 +45,12 @@ private:
 };
 
 inline std::map<QUuid, Vertex> all_vertices;
-inline Vertex shite;
+inline QUuid shite;
 
 class Edge {
 public:
     Edge() = default;
-    Edge(Vertex &start, Vertex &finish, std::string name, int property);
+    Edge(QUuid start, QUuid finish, std::string name, int property);
 
     QUuid generator_id_edge();
 
@@ -60,7 +60,7 @@ public:
 
     std::vector<QUuid> &get_polygons();
 
-    std::pair<Vertex &, Vertex &> get_coords();
+    std::pair<QUuid, QUuid> get_coords();
 
     void add_polygon(QUuid polygon_id);
 
@@ -71,7 +71,7 @@ public:
 private:
     int property;
     QUuid id;
-    std::pair<Vertex &, Vertex &> coords{shite, shite};
+    std::pair<QUuid, QUuid> coords{shite, shite};
     std::string name;
     std::vector<QUuid> polygons;
 };

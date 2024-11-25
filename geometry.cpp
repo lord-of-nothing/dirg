@@ -119,12 +119,12 @@ void Vertex::remove_polygon(QUuid polygon_id) {
 //     all_vertices.erase(id);
 // }
 
-Edge::Edge(Vertex &start, Vertex &finish, std::string name, int property) : property(property), coords({start, finish}), name(name) {
+Edge::Edge(QUuid start, QUuid finish, std::string name, int property) : property(property), coords({start, finish}), name(name) {
     QUuid id = generator_id_edge();
     this->id = id;
     all_edges[id] = *this;
-    all_vertices[start.get_id()].add_edge(id);
-    all_vertices[finish.get_id()].add_edge(id);
+    all_vertices[start].add_edge(id);
+    all_vertices[finish].add_edge(id);
 }
 
 QUuid Edge::get_id() {
@@ -139,7 +139,7 @@ std::vector<QUuid> &Edge::get_polygons() {
     return polygons;
 }
 
-std::pair<Vertex &, Vertex &> Edge::get_coords() {
+std::pair<QUuid, QUuid> Edge::get_coords() {
     return coords;
 }
 
@@ -303,10 +303,10 @@ bool check_new_point(double first_x, double first_y, double second_x, double sec
     bool second_check = true;
 
     for (auto& pair : all_edges) {
-        double old_first_x = pair.second.get_coords().first.get_x();
-        double old_first_y = pair.second.get_coords().first.get_y();
-        double old_second_x = pair.second.get_coords().second.get_x();
-        double old_second_y = pair.second.get_coords().second.get_y();
+        double old_first_x = all_vertices[pair.second.get_coords().first].get_x();
+        double old_first_y = all_vertices[pair.second.get_coords().first].get_y();
+        double old_second_x = all_vertices[pair.second.get_coords().second].get_x();
+        double old_second_y = all_vertices[pair.second.get_coords().second].get_y();
         if (check_intersect(old_first_x, old_first_y, old_second_x, old_second_y, second_x, second_y, third_x, third_y) == false) {
             second_check = false;
         }
@@ -320,7 +320,7 @@ bool point_in_polygon(double x, double y, QUuid polygon_id){
     double vector_y = 40000 + QRandomGenerator::global()->bounded(0, 2000);
     int count_intersection = 0;
     for (auto& edge : all_polygons[polygon_id].get_edges()) {
-        if (check_intersect(x, y, vector_x, vector_y, all_edges[edge].get_coords().first.get_x(), all_edges[edge].get_coords().first.get_y(), all_edges[edge].get_coords().second.get_x(), all_edges[edge].get_coords().second.get_y())) {
+        if (check_intersect(x, y, vector_x, vector_y, all_vertices[all_edges[edge].get_coords().first].get_x(), all_vertices[all_edges[edge].get_coords().first].get_y(), all_vertices[all_edges[edge].get_coords().second].get_x(), all_vertices[all_edges[edge].get_coords().second].get_y())) {
             count_intersection++;
         }
     }

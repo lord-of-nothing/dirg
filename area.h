@@ -16,7 +16,7 @@ public:
 signals:
     void bufferConnect(QVector<QVector2D>* data, Polygon* editedP);
     void polygonSelect(Polygon* polygon);
-    void polygonAdd(Polygon* polygon);
+    // void polygonAdd(Polygon* polygon);
 private:
     Mediator() {}
 };

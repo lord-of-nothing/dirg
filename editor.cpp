@@ -32,9 +32,9 @@ Editor::Editor(QWidget *parent)
     connect(ui->cancelBtn, &QPushButton::released, this, &Editor::resetEditor);
 
     // setupNew();
-   // }
+    // }
 
-// void Editor::setupNew() {
+    // void Editor::setupNew() {
     vtable->insertRow(0);
     QLineEdit* nameEdit = new QLineEdit(this);
     nameEdit->setPlaceholderText("Name");
@@ -55,6 +55,8 @@ Editor::Editor(QWidget *parent)
     connect(addBtn, &QPushButton::released, this, &Editor::onBufferConnect);
     vtable->setCellWidget(0, 3, addBtn);
     polygonNumber = Polygon::get_polygons_total();
+
+    connect(Mediator::instance(), &Mediator::polygonSelect, this, &Editor::onPolygonSelectReceived);
 }
 
 void Editor::addVertexRow(int row, QString vName, double x, double y) {
@@ -124,7 +126,7 @@ void Editor::addVertex() {
 
     addVertexRow(row, name, x, y);
 
-  }
+}
 
 void Editor::editVertex(int row) {
     for (int i = 0; i < 3; ++i) {
@@ -244,8 +246,8 @@ void Editor::savePolygon() {
             ename = "E" + QString::number(polygonNumber) + "_" + QString::number(row);
         }
         int property = qobject_cast<QComboBox*>(etable->cellWidget(row, 1))->currentText().toInt();
-        Edge e(all_vertices[vertices[row]], all_vertices[vertices[(row + 1) % etable->rowCount()]],
-                ename.toStdString(), property);
+        Edge e(vertices[row], vertices[(row + 1) % etable->rowCount()],
+               ename.toStdString(), property);
         edges.push_back(e.get_id());
     }
 
