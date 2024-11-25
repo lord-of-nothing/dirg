@@ -9,7 +9,7 @@
 class Vertex {
 public:
     Vertex() = default;
-    Vertex(double x, double y, std::string &name);
+    Vertex(double x, double y, std::string name);
 
     QUuid generator_id_vertex();
 
@@ -50,7 +50,7 @@ inline Vertex shite;
 class Edge {
 public:
     Edge() = default;
-    Edge(Vertex &start, Vertex &finish, std::string &name, int property);
+    Edge(Vertex &start, Vertex &finish, std::string name, int property);
 
     QUuid generator_id_edge();
 
@@ -79,7 +79,7 @@ inline std::map<QUuid, Edge> all_edges;
 class Polygon {
 public:
     Polygon() = default;
-    Polygon(std::vector<QUuid> &vertices, std::vector<QUuid> &edges, std::string &name, int material);
+    Polygon(std::vector<QUuid> &vertices, std::vector<QUuid> &edges, std::string name, int material);
 
     QUuid generator_id_polygon();
 
@@ -101,10 +101,10 @@ public:
 
     void delete_polygon();
 
-    int get_polygon_number();
+    static int get_polygon_number();
 
 private:
-    int polygon_number = 0;
+    inline static int polygon_number = 0;
     QUuid id;
     std::string name;
     std::vector<QUuid> edges;

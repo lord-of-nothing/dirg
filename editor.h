@@ -6,6 +6,7 @@
 #include <QTableWidget>
 #include <QPushButton>
 #include <QVector2D>
+#include <QDockWidget>
 
 namespace Ui {
 class Editor;
@@ -35,12 +36,16 @@ private:
     void finishEditVertex(int row);
     void editVertex(int row);
     void clearNew();
+    void savePolygon();
+    void resetEditor();
 
     Ui::Editor *ui;
     QTableWidget* vtable;
     QPushButton* cancelBtn = nullptr;; // костыль
     QTableWidget* etable;
     QVector<QVector2D> buffer;
+    QDockWidget* dock;
+    int polygonNumber;
 
     const double minCoord = 0.0;
     const double maxCoord = 1000.0;

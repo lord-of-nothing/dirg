@@ -8,6 +8,7 @@
 #include <QComboBox>
 
 #include "area.h"
+#include "geometry.h"
 
 QVector<QString> materials{"1", "2", "3"};
 
@@ -16,6 +17,7 @@ Editor::Editor(QWidget *parent)
     , ui(new Ui::Editor)
 {
     ui->setupUi(this);
+    dock = qobject_cast<QDockWidget*>(parentWidget());
     vtable = ui->vertexTable;
     etable = ui->edgeTable;
 
@@ -24,6 +26,9 @@ Editor::Editor(QWidget *parent)
 
     etable->setColumnCount(2);
     etable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    connect(ui->confirmBtn, &QPushButton::released, this, &Editor::savePolygon);
+    connect(ui->cancelBtn, &QPushButton::released, this, &Editor::resetEditor);
 
     setupNew();
    }
@@ -48,6 +53,7 @@ void Editor::setupNew() {
     connect(addBtn, &QPushButton::released, this, &Editor::addVertex);
     connect(addBtn, &QPushButton::released, this, &Editor::onBufferConnect);
     vtable->setCellWidget(0, 3, addBtn);
+    polygonNumber = Polygon::get_polygon_number();
 
 }
 
@@ -57,7 +63,8 @@ void Editor::addVertex() {
 
     QString name = static_cast<QLineEdit*>(vtable->cellWidget(row, 0))->text();
     if (name.isEmpty()) {
-        return;
+        // return;
+        name = "V" + QString::number(polygonNumber) + "_" + QString::number(row);
     }
 
     QLineEdit* nameEdit = new QLineEdit(this);
@@ -99,6 +106,7 @@ void Editor::addVertex() {
     etable->insertRow(row);
     QLineEdit* edgeNameEdit = new QLineEdit(this);
     edgeNameEdit->setPlaceholderText("Name");
+    edgeNameEdit->setText("E" + QString::number(polygonNumber) + "_" + QString::number(row));
     etable->setCellWidget(row, 0, edgeNameEdit);
     QComboBox* materialCombo = new QComboBox(this);
     materialCombo->addItems(materials);
@@ -192,6 +200,57 @@ void Editor::resizeEvent(QResizeEvent *event) {
 void Editor::onBufferConnect() {
     emit Mediator::instance()->bufferConnect(&buffer);
     // qWarning() << "sent";
+}
+
+void Editor::savePolygon() {
+    if (etable->rowCount() < 3) {
+        return;
+    }
+
+    std::vector<QUuid> vertices;
+    std::vector<QUuid> edges;
+
+    // создаём точки
+    for (int row = 0; row < etable->rowCount(); ++row) {
+        std::string vname = qobject_cast<QLineEdit*>(vtable->cellWidget(row, 0))->text().toStdString();
+        double x = qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 1))->value();
+        double y = qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 2))->value();
+        Vertex v(x, y, vname);
+        vertices.push_back(v.get_id());
+    }
+
+    // создаём рёбра
+    for (int row = 0; row < etable->rowCount(); ++row) {
+        QString ename = qobject_cast<QLineEdit*>(etable->cellWidget(row, 0))->text();
+        if (ename == "") {
+            ename = "E" + QString::number(polygonNumber) + "_" + QString::number(row);
+        }
+        int property = qobject_cast<QComboBox*>(etable->cellWidget(row, 1))->currentText().toInt();
+        Edge e(all_vertices[vertices[row]], all_vertices[vertices[(row + 1) % etable->rowCount()]],
+                ename.toStdString(), property);
+        edges.push_back(e.get_id());
+    }
+
+    // где-то здесь должна быть проверка корректности
+
+    // создаём полигон
+    std::string name = "P" + QString::number(polygonNumber).toStdString();
+    Polygon p(vertices, edges, name, 1);
+
+    resetEditor();
+}
+
+void Editor::resetEditor() {
+    while (vtable->rowCount() > 1) {
+        vtable->removeRow(0);
+    }
+    while (etable->rowCount() > 0) {
+        etable->removeRow(0);
+    }
+    buffer.clear();
+    // emit Mediator::instance()->bufferConnect(&buffer);
+    clearNew();
+    dock->close();
 }
 
 Editor::~Editor()

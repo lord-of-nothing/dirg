@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QVector2D>
 #include <QPointF>
+#include "geometry.h"
 
 Area::Area(QWidget *parent)
     : QWidget{parent}
@@ -14,16 +15,34 @@ Area::Area(QWidget *parent)
 
 void Area::paintEvent(QPaintEvent* event) {
     // qWarning() << "paint";
-    if (bufferData == nullptr || bufferData->size() == 0) {
-        return;
-    }
     QPainter painter(this);
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
+    QBrush brush(Qt::black, Qt::SolidPattern);
+    QPen pen(Qt::black);
+
     // Настройка кисти для рисования точек
-    QBrush brush(Qt::blue, Qt::SolidPattern);
-    painter.setBrush(brush);
+    painter.setBrush(Qt::black);
+    painter.setPen(Qt::black);
+    for (auto& [id, polygon] : all_polygons) {
+        std::vector<QUuid>& vertices = polygon.get_vertices();
+        qWarning() << vertices.size();
+        for (int i = 0; i < vertices.size(); ++i) {
+            Vertex& curV = all_vertices[vertices[i]];
+            Vertex& nextV = all_vertices[vertices[(i + 1) % vertices.size()]];
+
+            painter.drawEllipse(QPointF(curV.get_x(), curV.get_y()), 3.0, 3.0);
+            painter.drawLine(QPointF(curV.get_x(), curV.get_y()), QPointF(nextV.get_x(), nextV.get_y()));
+        }
+    }
+    if (bufferData == nullptr || bufferData->size() == 0) {
+        return;
+    }
+
+    // brush.setColor(Qt::red);
+    painter.setBrush(Qt::red);
+    painter.setPen(Qt::red);
 
     // for (const QVector2D &point : *bufferData) {
     for (int i = 0; i < bufferData->size(); ++i) {

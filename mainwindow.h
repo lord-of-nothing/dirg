@@ -20,6 +20,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    Editor editor;
+    // Editor editor;
+
 };
 #endif // MAINWINDOW_H

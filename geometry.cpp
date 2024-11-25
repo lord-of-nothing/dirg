@@ -31,7 +31,7 @@ QUuid Polygon::generator_id_polygon() {
 }
 
 
-Vertex::Vertex(double x, double y, std::string &name) : x(x), y(y), name(name) {
+Vertex::Vertex(double x, double y, std::string name) : x(x), y(y), name(name) {
     QUuid id = generator_id_vertex();
     this->id = id;
     all_vertices[id] = *this;
@@ -119,7 +119,7 @@ void Vertex::remove_polygon(QUuid polygon_id) {
 //     all_vertices.erase(id);
 // }
 
-Edge::Edge(Vertex &start, Vertex &finish, std::string &name, int property) : property(property), coords({start, finish}), name(name) {
+Edge::Edge(Vertex &start, Vertex &finish, std::string name, int property) : property(property), coords({start, finish}), name(name) {
     QUuid id = generator_id_edge();
     this->id = id;
     all_edges[id] = *this;
@@ -157,7 +157,7 @@ void Edge::remove_polygon(QUuid polygon_id) {
     }
 }
 
-Polygon::Polygon(std::vector<QUuid> &vertices, std::vector<QUuid> &edges, std::string &name,
+Polygon::Polygon(std::vector<QUuid> &vertices, std::vector<QUuid> &edges, std::string name,
                  int material) : name(name), edges(edges), vertices(vertices), material(material) {
     QUuid id = generator_id_polygon();
     this->id = id;
