@@ -18,7 +18,7 @@ Editor::Editor(QWidget *parent)
 {
     ui->setupUi(this);
     dock = qobject_cast<QDockWidget*>(parentWidget());
-    mainWindow = qobject_cast<MainWindow*>(dock->parentWidget());
+    // mainWindow = qobject_cast<MainWindow*>(dock->parentWidget());
     vtable = ui->vertexTable;
     etable = ui->edgeTable;
 
@@ -56,10 +56,11 @@ Editor::Editor(QWidget *parent)
     vtable->setCellWidget(0, 3, addBtn);
     polygonNumber = Polygon::get_polygons_total();
 
-    connect(Mediator::instance(), &Mediator::polygonSelect, this, &Editor::onPolygonSelectReceived);
+    connect(Mediator::instance(), &Mediator::onPolygonSelect, this, &Editor::onPolygonSelectReceived);
+    connect(Mediator::instance(), &Mediator::onEditorReset, this, &Editor::resetEditor);
 }
 
-void Editor::addVertexRow(int row, QString vName, double x, double y) {
+void Editor::addVRow(int row, QString vName, double x, double y) {
     // int row = vtable->rowCount() - 1;
 
     QLineEdit* nameEdit = new QLineEdit(this);
@@ -124,7 +125,7 @@ void Editor::addVertex() {
     double x = static_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 1))->value();
     double y = static_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 2))->value();
 
-    addVertexRow(row, name, x, y);
+    addVRow(row, name, x, y);
 
 }
 
@@ -210,7 +211,7 @@ void Editor::resizeEvent(QResizeEvent *event) {
 }
 
 void Editor::onBufferConnect() {
-    emit Mediator::instance()->bufferConnect(&buffer, editedPolygon);
+    emit Mediator::instance()->onBufferConnect(&buffer, editedPolygon);
     // qWarning() << "sent";
 }
 
@@ -257,10 +258,11 @@ void Editor::savePolygon() {
     Polygon* p = new Polygon(vertices, edges, name, 1, polygonNumber, id);
 
     // emit Mediator::instance()->polygonAdd(&p);
-    if (!id.isNull()) {
-        mainWindow->removePolygon(id);
-    }
-    mainWindow->addPolygon(p);
+    // if (!id.isNull()) {
+        // mainWindow->removePolygon(id);
+    // }
+    // mainWindow->addPolygon(p);
+    emit Mediator::instance()->onPolygonSave(p, id.isNull());
     resetEditor();
 }
 
@@ -272,6 +274,7 @@ void Editor::resetEditor() {
         etable->removeRow(0);
     }
     buffer.clear();
+    emit Mediator::instance()->onBufferConnect(&buffer, nullptr);
     polygonNumber = Polygon::get_polygons_total();
     clearNew();
     editedPolygon = nullptr;
@@ -280,18 +283,24 @@ void Editor::resetEditor() {
 
 void Editor::onPolygonSelectReceived(Polygon* polygon) {
     dock->show();
+    if (polygon == editedPolygon) {
+        emit Mediator::instance()->onBufferConnect(&buffer, polygon);
+        return;
+    }
     setupExistingPolygon(polygon);
+
 }
 
 void Editor::setupExistingPolygon(Polygon* polygon) {
     editedPolygon = polygon;
     polygonNumber = editedPolygon->get_number();
+    // emit Mediator::instance()->onBufferConnect(&buffer, polygon);
     for (auto& vId : polygon->get_vertices()) {
         Vertex& v = all_vertices[vId];
         QString vName = QString::fromStdString(v.get_name());
         double x = v.get_x();
         double y = v.get_y();
-        addVertexRow(vtable->rowCount() - 1, vName, x, y);
+        addVRow(vtable->rowCount() - 1, vName, x, y);
     }
 
     for (auto& eId : polygon->get_edges()) {

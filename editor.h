@@ -22,7 +22,6 @@ public:
     explicit Editor(QWidget *parent = nullptr);
     // void setupNew();
     void setupExistingPolygon(Polygon* polygon);
-    void resetEditor();
     ~Editor();
 
 protected:
@@ -36,13 +35,14 @@ private slots:
 private:
     void updateTableSize();
     void addVertex();
-    void addVertexRow(int row, QString vName, double x, double y);
+    void addVRow(int row, QString vName, double x, double y);
     void saveVertex(int row);
     void resetVertex(int row);
     void finishEditVertex(int row);
     void editVertex(int row);
     void clearNew();
     void savePolygon();
+    void resetEditor();
 
     Ui::Editor *ui;
     QTableWidget* vtable;

@@ -10,7 +10,7 @@
 Area::Area(QWidget *parent)
     : QWidget{parent}
 {
-    connect(Mediator::instance(), &Mediator::bufferConnect, this, &Area::onBufferConnectReceived);
+    connect(Mediator::instance(), &Mediator::onBufferConnect, this, &Area::onBufferConnectReceived);
     // qWarning() << "constr";
 }
 
@@ -69,7 +69,7 @@ void Area::mousePressEvent(QMouseEvent* event) {
     if (candidates.size() == 0) {
         return;
     }
-    emit Mediator::instance()->polygonSelect(&all_polygons[candidates.back()]);
+    emit Mediator::instance()->onPolygonSelect(&all_polygons[candidates.back()]);
 }
 
 void Area::onBufferConnectReceived(QVector<QVector2D>* data, Polygon* editedP) {

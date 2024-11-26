@@ -16,14 +16,19 @@ MainWindow::MainWindow(QWidget *parent)
         QUuid id = item->data(0, Qt::UserRole).value<QUuid>();
         selectPolygon(id);
     });
-
+    connect(Mediator::instance(), &Mediator::onPolygonSave, this, [this] (Polygon* polygon, bool isNew) {
+        if (!isNew) {
+            removePolygon(polygon->get_id());
+        }
+        addPolygon(polygon);
+    });
 }
 
+
 void MainWindow::newPolygon() {
-    if (ui->editorDock->isVisible()){
-        Editor* editor = qobject_cast<Editor*>(ui->editorDock->widget());
-        editor->resetEditor();
-    }
+    // if (ui->editorDock->isVisible()){
+        // emit Mediator::instance()->onEditorReset();
+    // }
     ui->editorDock->show();
 }
 
@@ -31,7 +36,6 @@ void MainWindow::addPolygon(Polygon* polygon) {
     QTreeWidgetItem* polyItem = new QTreeWidgetItem(ui->tree);
     polyItem->setText(0, QString::fromStdString(polygon->get_name()));
     polyItem->setData(0, Qt::UserRole, QVariant::fromValue(polygon->get_id()));
-    // connect(polyItem, &QTreeWidget::itemClicked, this, [this, polygon](){selectPolygon(polygon);})
 
     QTreeWidgetItem* vertexFolder = new QTreeWidgetItem(polyItem);
     vertexFolder->setText(0, "Vertices");
@@ -64,13 +68,11 @@ void MainWindow::removePolygon(QUuid id) {
 
 void MainWindow::selectPolygon(QUuid id) {
     Polygon* polygon = &all_polygons[id];
-    Editor* editor = qobject_cast<Editor*>(ui->editorDock->widget());
-     if (ui->editorDock->isVisible()){
-        editor->resetEditor();
-    }
+     // if (ui->editorDock->isVisible()){
+         // emit Mediator::instance()->onEditorReset();
+    // }
     ui->editorDock->show();
-    editor->setupExistingPolygon(polygon);
-
+    emit Mediator::instance()->onPolygonSelect(polygon);
 }
 
 MainWindow::~MainWindow()

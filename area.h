@@ -14,8 +14,10 @@ public:
     }
 
 signals:
-    void bufferConnect(QVector<QVector2D>* data, Polygon* editedP);
-    void polygonSelect(Polygon* polygon);
+    void onBufferConnect(QVector<QVector2D>* data, Polygon* editedP);
+    void onPolygonSelect(Polygon* polygon);
+    void onEditorReset();
+    void onPolygonSave(Polygon* polygon, bool isNew);
     // void polygonAdd(Polygon* polygon);
 private:
     Mediator() {}
