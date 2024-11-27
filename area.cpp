@@ -10,8 +10,9 @@
 Area::Area(QWidget *parent)
     : QWidget{parent}
 {
-    connect(Mediator::instance(), &Mediator::onBufferConnect, this, &Area::onBufferConnectReceived);
+    // connect(Mediator::instance(), &Mediator::bufferConnect, this, &Area::onBufferConnectReceived);
     // qWarning() << "constr";
+     connect(Mediator::instance(), &Mediator::onBufferConnect, this, &Area::onBufferConnectReceived);
 }
 
 void Area::paintEvent(QPaintEvent* event) {
@@ -26,11 +27,28 @@ void Area::paintEvent(QPaintEvent* event) {
     // Настройка кисти для рисования точек
     painter.setBrush(Qt::black);
     painter.setPen(Qt::black);
-    for (auto& [id, polygon] : all_polygons) {
+    // for (auto& [id, polygon] : all_polygons) {
+    //     if (edited == &polygon) {
+    //         continue;
+    //     }
+    //     QVector<QUuid>& vertices = polygon.get_vertices();
+    //     qWarning() << vertices.size();
+    //     for (int i = 0; i < vertices.size(); ++i) {
+    //         Vertex& curV = all_vertices[vertices[i]];
+    //         Vertex& nextV = all_vertices[vertices[(i + 1) % vertices.size()]];
+
+    //         painter.drawEllipse(QPointF(curV.get_x(), curV.get_y()), 3.0, 3.0);
+    //         painter.drawLine(QPointF(curV.get_x(), curV.get_y()), QPointF(nextV.get_x(), nextV.get_y()));
+    //     }
+    // }
+
+    for (auto polygons =  all_polygons.begin(); polygons !=  all_polygons.end(); ++polygons) {
+        QUuid id = polygons.key();
+        Polygon& polygon = polygons.value();
         if (edited == &polygon) {
             continue;
         }
-        std::vector<QUuid>& vertices = polygon.get_vertices();
+        QVector<QUuid>& vertices = polygon.get_vertices();
         qWarning() << vertices.size();
         for (int i = 0; i < vertices.size(); ++i) {
             Vertex& curV = all_vertices[vertices[i]];
@@ -69,6 +87,7 @@ void Area::mousePressEvent(QMouseEvent* event) {
     if (candidates.size() == 0) {
         return;
     }
+    // emit Mediator::instance()->polygonSelect(&all_polygons[candidates.back()]);
     emit Mediator::instance()->onPolygonSelect(&all_polygons[candidates.back()]);
 }
 

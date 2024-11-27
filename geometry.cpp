@@ -1,4 +1,3 @@
-#include <string>
 #include "geometry.h"
 #include <QRandomGenerator>
 #include <QUuid>
@@ -31,7 +30,7 @@ QUuid Polygon::generator_id_polygon() {
 }
 
 
-Vertex::Vertex(double x, double y, std::string name) : x(x), y(y), name(name) {
+Vertex::Vertex(double x, double y, QString name) : x(x), y(y), name(name) {
     QUuid id = generator_id_vertex();
     this->id = id;
     all_vertices[id] = *this;
@@ -50,24 +49,24 @@ QUuid Vertex::get_id() {
     return id;
 }
 
-std::string Vertex::get_name() {
+QString Vertex::get_name() {
     return name;
 }
 
-std::vector<QUuid> &Vertex::get_edges() {
+QVector<QUuid> &Vertex::get_edges() {
     return edges;
 }
 
-std::vector<QUuid> &Vertex::get_polygons() {
+QVector<QUuid> &Vertex::get_polygons() {
     return polygons;
 }
 
 void Vertex::add_edge(QUuid edge_id) {
-    edges.push_back(edge_id);
+    edges.append(edge_id);
 }
 
 void Vertex::add_polygon(QUuid polygon_id) {
-    polygons.push_back(polygon_id);
+    polygons.append(polygon_id);
 }
 
 //эта штука сейчас не нужна, мб потом пригодится
@@ -119,7 +118,7 @@ void Vertex::remove_polygon(QUuid polygon_id) {
 //     all_vertices.erase(id);
 // }
 
-Edge::Edge(QUuid start, QUuid finish, std::string name, int property) : property(property), coords({start, finish}), name(name) {
+Edge::Edge(QUuid start, QUuid finish, QString name, int property) : property(property), coords({start, finish}), name(name) {
     QUuid id = generator_id_edge();
     this->id = id;
     all_edges[id] = *this;
@@ -131,20 +130,20 @@ QUuid Edge::get_id() {
     return id;
 }
 
-std::string Edge::get_name() {
+QString Edge::get_name() {
     return name;
 }
 
-std::vector<QUuid> &Edge::get_polygons() {
+QVector<QUuid> &Edge::get_polygons() {
     return polygons;
 }
 
-std::pair<QUuid, QUuid> Edge::get_coords() {
+QPair<QUuid, QUuid> Edge::get_coords() {
     return coords;
 }
 
 void Edge::add_polygon(QUuid polygon_id) {
-    polygons.push_back(polygon_id);
+    polygons.append(polygon_id);
 }
 
 int Edge::get_property() {
@@ -161,7 +160,7 @@ void Edge::remove_polygon(QUuid polygon_id) {
     }
 }
 
-Polygon::Polygon(std::vector<QUuid> &vertices, std::vector<QUuid> &edges, std::string name,
+Polygon::Polygon(QVector<QUuid> &vertices, QVector<QUuid> &edges, QString name,
                  int material, int existingNumber, QUuid existingId) : name(name), edges(edges), vertices(vertices), material(material),
     cur_polygon_number(existingNumber) {
     if (existingId.isNull()){
@@ -187,7 +186,7 @@ QUuid Polygon::get_id() {
     return id;
 }
 
-std::string Polygon::get_name() {
+QString Polygon::get_name() {
     return name;
 }
 
@@ -200,11 +199,11 @@ int Polygon::get_number(){
 }
 
 
-std::vector<QUuid> &Polygon::get_vertices() {
+QVector<QUuid> &Polygon::get_vertices() {
     return vertices;
 }
 
-std::vector<QUuid> &Polygon::get_edges() {
+QVector<QUuid> &Polygon::get_edges() {
     return edges;
 }
 
@@ -258,20 +257,20 @@ void Polygon::delete_polygon() {
     QUuid polygon_id = id;
     for (int i = 0; i < vertices.size(); ++i) {
         // all_vertices[vertices[i]].remove_polygon(polygon_id);
-        all_vertices.erase(vertices[i]);
+        all_vertices.remove(vertices[i]);
     }
 
     for (int i = 0; i < edges.size(); ++i) {
         // all_edges[edges[i]].remove_polygon(polygon_id);
-        all_edges.erase(edges[i]);
+        all_edges.remove(edges[i]);
     }
-    all_polygons.erase(polygon_id);
+    all_polygons.remove(polygon_id);
 }
 
 
 bool check_convex(double first_x, double first_y, double second_x, double second_y, double third_x, double third_y) {
-    std::pair first_vector = {second_x - first_x, second_y - first_y};
-    std::pair second_vector = {third_x - second_x, third_y - second_y};
+    QPair<double, double> first_vector(second_x - first_x, second_y - first_y);
+    QPair<double, double> second_vector(third_x - second_x, third_y - second_y);
     double mult = first_vector.first * second_vector.second - second_vector.first * first_vector.second;
     return mult <= 0;
 }
@@ -302,11 +301,21 @@ bool check_new_point(double first_x, double first_y, double second_x, double sec
     bool first_check = check_convex(first_x, first_y, second_x, second_y, third_x, third_y);
     bool second_check = true;
 
-    for (auto& pair : all_edges) {
-        double old_first_x = all_vertices[pair.second.get_coords().first].get_x();
-        double old_first_y = all_vertices[pair.second.get_coords().first].get_y();
-        double old_second_x = all_vertices[pair.second.get_coords().second].get_x();
-        double old_second_y = all_vertices[pair.second.get_coords().second].get_y();
+    // for (auto& pair : all_edges) {
+    //     double old_first_x = all_vertices[pair.second.get_coords().first].get_x();
+    //     double old_first_y = all_vertices[pair.second.get_coords().first].get_y();
+    //     double old_second_x = all_vertices[pair.second.get_coords().second].get_x();
+    //     double old_second_y = all_vertices[pair.second.get_coords().second].get_y();
+    //     if (check_intersect(old_first_x, old_first_y, old_second_x, old_second_y, second_x, second_y, third_x, third_y) == false) {
+    //         second_check = false;
+    //     }
+    // }
+
+    for (auto pair = all_edges.begin(); pair != all_edges.end(); ++pair) {
+        double old_first_x = all_vertices[pair.value().get_coords().first].get_x();
+        double old_first_y = all_vertices[pair.value().get_coords().first].get_y();
+        double old_second_x = all_vertices[pair.value().get_coords().second].get_x();
+        double old_second_y = all_vertices[pair.value().get_coords().second].get_y();
         if (check_intersect(old_first_x, old_first_y, old_second_x, old_second_y, second_x, second_y, third_x, third_y) == false) {
             second_check = false;
         }
@@ -327,12 +336,67 @@ bool point_in_polygon(double x, double y, QUuid polygon_id){
     return count_intersection % 2 == 1;
 }
 
-std::vector<QUuid> find_polygons_by_point(double x, double y) {
-    std::vector<QUuid> polygons;
-    for (auto& polygon : all_polygons) {
-        if (point_in_polygon(x, y, polygon.first)) {
-            polygons.push_back(polygon.first);
+QVector<QUuid> find_polygons_by_point(double x, double y) {
+    QVector<QUuid> polygons;
+    // for (auto& polygon : all_polygons) {
+    //     if (point_in_polygon(x, y, polygon.first)) {
+    //         polygons.append(polygon.first);
+    //     }
+    // }
+
+    for (auto polygon =  all_polygons.begin(); polygon !=  all_polygons.end(); ++polygon) {
+        if (point_in_polygon(x, y, polygon.key())) {
+            polygons.append(polygon.key());
         }
     }
     return polygons;
 }
+
+double cross(QPair<double, double> first_vector, QPair<double, double> second_vector) {
+    double mult = first_vector.first * second_vector.second - second_vector.first * first_vector.second;
+    return mult;
+}
+
+bool isConvex(QVector<QPair<double, double>> vertices) {
+    double init = cross({vertices[1].first - vertices[0].first, vertices[1].second - vertices[0].second}, {vertices[2].first - vertices[1].first, vertices[2].second - vertices[1].second});
+    for (int i = 1; i < vertices.size(); i++) {
+        double current_cross = cross({vertices[i].first - vertices[i - 1].first, vertices[i].second - vertices[i - 1].second}, {vertices[(i + 1) % vertices.size()].first - vertices[i].first, vertices[(i + 1) % vertices.size()].second - vertices[i].second});
+        if (init * current_cross < 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isNotIntersecting(QVector<std::pair<double, double>> vertices) {
+    for (int i = 0; i < vertices.size(); i++) {
+        // for (auto& pair : all_edges) {
+        //     double old_first_x = all_vertices[pair.second.get_coords().first].get_x();
+        //     double old_first_y = all_vertices[pair.second.get_coords().first].get_y();
+        //     double old_second_x = all_vertices[pair.second.get_coords().second].get_x();
+        //     double old_second_y = all_vertices[pair.second.get_coords().second].get_y();
+        //     if (check_intersect(old_first_x, old_first_y, old_second_x, old_second_y, vertices[i].first, vertices[i].second, vertices[(i + 1) % vertices.size()].first, vertices[(i + 1) % vertices.size()].second)) {
+        //         return false;
+        //     }
+        // }
+
+        for (auto pair = all_edges.begin(); pair != all_edges.end(); ++pair) {
+            double old_first_x = all_vertices[pair.value().get_coords().first].get_x();
+            double old_first_y = all_vertices[pair.value().get_coords().first].get_y();
+            double old_second_x = all_vertices[pair.value().get_coords().second].get_x();
+            double old_second_y = all_vertices[pair.value().get_coords().second].get_y();
+            if (check_intersect(old_first_x, old_first_y, old_second_x, old_second_y, vertices[i].first, vertices[i].second, vertices[(i + 1) % vertices.size()].first, vertices[(i + 1) % vertices.size()].second)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+
+bool checkPolygon(QVector<QPair<double, double>> vertices) {
+    bool firstFlag = isConvex(vertices);
+    bool secondFlag = isNotIntersecting(vertices);
+    return firstFlag && secondFlag;
+}
+

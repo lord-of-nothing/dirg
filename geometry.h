@@ -1,15 +1,17 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include <string>
-#include <vector>
 #include <map>
 #include <QUuid>
+#include <QString>
+#include <QVector>
+#include <QPair>
+#include <QHash>
 
 class Vertex {
 public:
     Vertex() = default;
-    Vertex(double x, double y, std::string name);
+    Vertex(double x, double y, QString name);
 
     QUuid generator_id_vertex();
 
@@ -19,11 +21,11 @@ public:
 
     QUuid get_id();
 
-    std::string get_name();
+    QString get_name();
 
-    std::vector<QUuid> &get_edges();
+    QVector<QUuid> &get_edges();
 
-    std::vector<QUuid> &get_polygons();
+    QVector<QUuid> &get_polygons();
 
     void add_edge(QUuid edge_id);
 
@@ -39,28 +41,28 @@ private:
     double x;
     double y;
     QUuid id;
-    std::string name;
-    std::vector<QUuid> polygons;
-    std::vector<QUuid> edges;
+    QString name;
+    QVector<QUuid> polygons;
+    QVector<QUuid> edges;
 };
 
-inline std::map<QUuid, Vertex> all_vertices;
+inline QHash<QUuid, Vertex> all_vertices;
 inline QUuid shite;
 
 class Edge {
 public:
     Edge() = default;
-    Edge(QUuid start, QUuid finish, std::string name, int property);
+    Edge(QUuid start, QUuid finish, QString name, int property);
 
     QUuid generator_id_edge();
 
     QUuid get_id();
 
-    std::string get_name();
+    QString get_name();
 
-    std::vector<QUuid> &get_polygons();
+    QVector<QUuid> &get_polygons();
 
-    std::pair<QUuid, QUuid> get_coords();
+    QPair<QUuid, QUuid> get_coords();
 
     void add_polygon(QUuid polygon_id);
 
@@ -71,28 +73,28 @@ public:
 private:
     int property;
     QUuid id;
-    std::pair<QUuid, QUuid> coords{shite, shite};
-    std::string name;
-    std::vector<QUuid> polygons;
+    QPair<QUuid, QUuid> coords{shite, shite};
+    QString name;
+    QVector<QUuid> polygons;
 };
 
-inline std::map<QUuid, Edge> all_edges;
+inline QHash<QUuid, Edge> all_edges;
 
 class Polygon {
 public:
     Polygon() = default;
-    Polygon(std::vector<QUuid> &vertices, std::vector<QUuid> &edges, std::string name, int material,
+    Polygon(QVector<QUuid> &vertices, QVector<QUuid> &edges, QString name, int material,
             int existingNumber = -1, QUuid existingId = QUuid());
 
     QUuid generator_id_polygon();
 
     QUuid get_id();
 
-    std::string get_name();
+    QString get_name();
 
-    std::vector<QUuid> &get_vertices();
+    QVector<QUuid> &get_vertices();
 
-    std::vector<QUuid> &get_edges();
+    QVector<QUuid> &get_edges();
 
     QUuid next_vertex(QUuid current_vertex);
 
@@ -111,13 +113,13 @@ private:
     inline static int total_polygon_number = 0;
     int cur_polygon_number;
     QUuid id;
-    std::string name;
-    std::vector<QUuid> edges;
-    std::vector<QUuid> vertices;
+    QString name;
+    QVector<QUuid> edges;
+    QVector<QUuid> vertices;
     int material;
 };
 
-inline std::map<QUuid, Polygon> all_polygons;
+inline QHash<QUuid, Polygon> all_polygons;
 
 bool check_new_point(double first_x, double first_y, double second_x, double second_y, double third_x, double third_y);
 bool check_convex(double first_x, double first_y, double second_x, double second_y, double third_x, double third_y);
@@ -125,6 +127,10 @@ double area(double first_x, double first_y, double second_x, double second_y, do
 bool intersect(double a, double b, double c, double d);
 bool check_intersect(double first_x, double first_y, double second_x, double second_y, double third_x, double third_y, double fourth_x, double fourth_y);
 bool point_in_polygon(double x, double y, QUuid polygon_id);
-std::vector<QUuid> find_polygons_by_point(double x, double y);
+QVector<QUuid> find_polygons_by_point(double x, double y);
+double cross(QPair<double, double> first_vector, QPair<double, double> second_vector);
+bool isConvex(QVector<QPair<double, double>> vertices);
+bool isNotIntersecting(QVector<QPair<double, double>> vertices);
+bool checkPolygon(QVector<QPair<double, double>> vertices);
 
 #endif // GEOMETRY_H

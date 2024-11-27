@@ -24,18 +24,22 @@ MainWindow::MainWindow(QWidget *parent)
     });
 }
 
-
 void MainWindow::newPolygon() {
     // if (ui->editorDock->isVisible()){
-        // emit Mediator::instance()->onEditorReset();
+    //     Editor* editor = qobject_cast<Editor*>(ui->editorDock->widget());
+    //     editor->resetEditor();
+    // }
+    // if (ui->editorDock->isVisible()){
+    // emit Mediator::instance()->onEditorReset();
     // }
     ui->editorDock->show();
 }
 
 void MainWindow::addPolygon(Polygon* polygon) {
     QTreeWidgetItem* polyItem = new QTreeWidgetItem(ui->tree);
-    polyItem->setText(0, QString::fromStdString(polygon->get_name()));
+    polyItem->setText(0, polygon->get_name());
     polyItem->setData(0, Qt::UserRole, QVariant::fromValue(polygon->get_id()));
+    // connect(polyItem, &QTreeWidget::itemClicked, this, [this, polygon](){selectPolygon(polygon);})
 
     QTreeWidgetItem* vertexFolder = new QTreeWidgetItem(polyItem);
     vertexFolder->setText(0, "Vertices");
@@ -44,11 +48,11 @@ void MainWindow::addPolygon(Polygon* polygon) {
 
     for (auto& vertex : polygon->get_vertices()) {
         QTreeWidgetItem* v = new QTreeWidgetItem(vertexFolder);
-        v->setText(0, QString::fromStdString(all_vertices[vertex].get_name()));
+        v->setText(0, all_vertices[vertex].get_name());
     }
     for (auto& edge : polygon->get_edges()) {
         QTreeWidgetItem* e = new QTreeWidgetItem(edgeFolder);
-        e->setText(0, QString::fromStdString(all_edges[edge].get_name()));
+        e->setText(0, all_edges[edge].get_name());
     }
 }
 
@@ -68,11 +72,17 @@ void MainWindow::removePolygon(QUuid id) {
 
 void MainWindow::selectPolygon(QUuid id) {
     Polygon* polygon = &all_polygons[id];
-     // if (ui->editorDock->isVisible()){
-         // emit Mediator::instance()->onEditorReset();
+    // Editor* editor = qobject_cast<Editor*>(ui->editorDock->widget());
+    // if (ui->editorDock->isVisible()){
+    //     editor->resetEditor();
+    // }
+    // if (ui->editorDock->isVisible()){
+    // emit Mediator::instance()->onEditorReset();
     // }
     ui->editorDock->show();
+    // editor->setupExistingPolygon(polygon);
     emit Mediator::instance()->onPolygonSelect(polygon);
+
 }
 
 MainWindow::~MainWindow()
