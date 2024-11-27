@@ -282,11 +282,12 @@ void Editor::resetEditor() {
 }
 
 void Editor::onPolygonSelectReceived(Polygon* polygon) {
-    dock->show();
     if (polygon == editedPolygon) {
+        dock->show();
         emit Mediator::instance()->onBufferConnect(&buffer, polygon);
         return;
     }
+    resetEditor();
     setupExistingPolygon(polygon);
 
 }
@@ -311,6 +312,8 @@ void Editor::setupExistingPolygon(Polygon* polygon) {
         qobject_cast<QLineEdit*>(etable->cellWidget(etable->rowCount() - 1, 0))->setText(eName);
         qobject_cast<QComboBox*>(etable->cellWidget(etable->rowCount() - 1, 1))->setCurrentText(material);
     }
+    dock->show();
+    emit Mediator::instance()->onBufferConnect(&buffer, polygon);
 }
 
 Editor::~Editor()
