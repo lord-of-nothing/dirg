@@ -15,10 +15,25 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="Area" name="paintArea" native="true">
       <property name="styleSheet">
-       <string notr="true">background-color: pink</string>
+       <string notr="true"/>
       </property>
      </widget>
     </item>
@@ -28,8 +43,14 @@
    <property name="styleSheet">
     <string notr="true"/>
    </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetFeature::DockWidgetFloatable|QDockWidget::DockWidgetFeature::DockWidgetMovable</set>
+   </property>
    <property name="allowedAreas">
     <set>Qt::DockWidgetArea::LeftDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Objects</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -64,6 +85,9 @@
   <widget class="QDockWidget" name="editorDock">
    <property name="allowedAreas">
     <set>Qt::DockWidgetArea::BottomDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string/>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>

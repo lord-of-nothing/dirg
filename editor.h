@@ -55,6 +55,10 @@ private:
     MainWindow* mainWindow;
     int polygonNumber;
     Polygon* editedPolygon = nullptr;
+    QIcon addIcon = style()->standardIcon(QStyle::SP_DialogOkButton);
+    QIcon editIcon = style()->standardIcon(QStyle::SP_ArrowBack);
+    QIcon saveIcon = style()->standardIcon(QStyle::SP_DialogApplyButton);
+    QIcon resetIcon = style()->standardIcon(QStyle::SP_DialogCancelButton);
 
     const double minCoord = 0.0;
     const double maxCoord = 1000.0;

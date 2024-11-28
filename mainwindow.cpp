@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "editor.h"
+#include <QPalette>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -22,6 +23,22 @@ MainWindow::MainWindow(QWidget *parent)
         }
         addPolygon(polygon);
     });
+
+    setWindowTitle("Grid Editor");
+    setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+
+
+    QColor gray(229, 228, 226);
+    QPalette pal = QPalette();
+    pal.setColor(QPalette::Window, gray);
+
+    ui->editorDock->setAutoFillBackground(true);
+    ui->editorDock->setPalette(pal);
+    ui->treeDock->setAutoFillBackground(true);
+    ui->treeDock->setPalette(pal);
+
+    setStyleSheet("QMainWindow::separator{ width: 0px; height: 0px; }");
+    // setDockOptions(QMainWindow::GroupedDockWidgets);
 }
 
 void MainWindow::newPolygon() {

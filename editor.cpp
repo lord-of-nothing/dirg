@@ -6,6 +6,7 @@
 #include <QDoubleSpinBox>
 #include <QVector>
 #include <QComboBox>
+#include <QStringList>
 
 #include "area.h"
 #include "geometry.h"
@@ -16,25 +17,40 @@ Editor::Editor(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Editor)
 {
+    // widget setup
     ui->setupUi(this);
     dock = qobject_cast<QDockWidget*>(parentWidget());
-    // mainWindow = qobject_cast<MainWindow*>(dock->parentWidget());
     vtable = ui->vertexTable;
     etable = ui->edgeTable;
 
     vtable->setColumnCount(5);
+    vtable->setHorizontalHeaderLabels(QStringList() << "Name" << "X" << "Y" << "" << "");
+    vtable->horizontalHeader()->setSectionsClickable(false);
+    vtable->horizontalHeader()->setSectionsMovable(false);
+    vtable->horizontalHeader()->setStyleSheet("QHeaderView::section {"
+                                                  "    border: none;"
+                                                  "}");
     vtable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     etable->setColumnCount(2);
+    etable->setHorizontalHeaderLabels(QStringList() << "Name" << "Property");
+    etable->horizontalHeader()->setSectionsClickable(false);
+    etable->horizontalHeader()->setSectionsMovable(false);
+    etable->horizontalHeader()->setStyleSheet("QHeaderView::section {"
+                                                  "    border: none;"
+                                                  "}");
     etable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     connect(ui->confirmBtn, &QPushButton::released, this, &Editor::savePolygon);
     connect(ui->cancelBtn, &QPushButton::released, this, &Editor::resetEditor);
 
-    // setupNew();
-    // }
+    setStyleSheet(
+        "QDoubleSpinBox::up-button { width: 0; height: 0; }"
+        "QDoubleSpinBox::down-button { width: 0; height: 0; }"
+        "QDoubleSpinBox { border: 1px solid gray; border-radius: 4px; padding: 2px 4px; }"
+        );
 
-    // void Editor::setupNew() {
+    // vertex table empty row setup
     vtable->insertRow(0);
     QLineEdit* nameEdit = new QLineEdit(this);
     nameEdit->setPlaceholderText("Name");
@@ -50,16 +66,19 @@ Editor::Editor(QWidget *parent)
     yEdit->setDecimals(precision);
     vtable->setCellWidget(0, 2, yEdit);
 
-    QPushButton* addBtn = new QPushButton("+", this);
+    QPushButton* addBtn = new QPushButton(this);
     connect(addBtn, &QPushButton::released, this, &Editor::addVertex);
     connect(addBtn, &QPushButton::released, this, &Editor::onBufferConnect);
     vtable->setCellWidget(0, 3, addBtn);
     polygonNumber = Polygon::get_polygons_total();
+    addBtn->setIcon(addIcon);
 
-    // connect(Mediator::instance(), &Mediator::polygonSelect, this, &Editor::onPolygonSelectReceived);
+    // opening editor on polygon selection
     connect(Mediator::instance(), &Mediator::onPolygonSelect, this, &Editor::onPolygonSelectReceived);
     connect(Mediator::instance(), &Mediator::onEditorReset, this, &Editor::resetEditor);
-}
+
+
+    }
 
 // void Editor::addVertexRow(int row, QString vName, double x, double y) {
 void Editor::addVRow(int row, QString vName, double x, double y) {
@@ -86,9 +105,11 @@ void Editor::addVRow(int row, QString vName, double x, double y) {
     vtable->setCellWidget(row, 1, xEdit);
     vtable->setCellWidget(row, 2, yEdit);
 
-    QPushButton* editBtn = new QPushButton("e", this);
+    QPushButton* editBtn = new QPushButton(this);
     connect(editBtn, &QPushButton::released, this, [this, row](){editVertex(row);});
-    QPushButton* saveBtn = new QPushButton("s", this);
+    editBtn->setIcon(editIcon);
+    QPushButton* saveBtn = new QPushButton(this);
+    saveBtn->setIcon(saveIcon);
     connect(saveBtn, &QPushButton::released, this, [this, row](){saveVertex(row);});
     connect(saveBtn, &QPushButton::released, this, &Editor::onBufferConnect);
 
@@ -136,7 +157,8 @@ void Editor::editVertex(int row) {
     for (int i = 0; i < 3; ++i) {
         vtable->cellWidget(row, i)->setEnabled(true);
     }
-    cancelBtn = new QPushButton("x", this);
+    cancelBtn = new QPushButton(this);
+    cancelBtn->setIcon(resetIcon);
     connect(cancelBtn, &QPushButton::released, this, [this, row](){resetVertex(row);});
     vtable->setCellWidget(row, 4, cancelBtn);
 
