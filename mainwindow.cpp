@@ -9,6 +9,11 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->editorDock->setWidget(new Editor(ui->editorDock));
+    connect(ui->editorDock, &QDockWidget::visibilityChanged, this, [this]() {
+        if (!ui->editorDock->isVisible()) {
+            emit Mediator::instance()->onEditorReset();
+        }
+    });
     ui->editorDock->close();
     ui->tree->setHeaderHidden(true);
     connect(ui->newPolygonBtn, &QPushButton::released, this, &MainWindow::newPolygon);
@@ -23,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
         }
         addPolygon(polygon);
     });
+    ui->tree->setSortingEnabled(true);
+    ui->tree->sortByColumn(0, Qt::AscendingOrder);
 
     setWindowTitle("Grid Editor");
     setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
@@ -49,6 +56,7 @@ void MainWindow::newPolygon() {
     // if (ui->editorDock->isVisible()){
     // emit Mediator::instance()->onEditorReset();
     // }
+    emit Mediator::instance()->onEditorReset();
     ui->editorDock->show();
 }
 
@@ -88,16 +96,11 @@ void MainWindow::removePolygon(QUuid id) {
 }
 
 void MainWindow::selectPolygon(QUuid id) {
+    if (id.isNull()) {
+        return;
+    }
     Polygon* polygon = &all_polygons[id];
-    // Editor* editor = qobject_cast<Editor*>(ui->editorDock->widget());
-    // if (ui->editorDock->isVisible()){
-    //     editor->resetEditor();
-    // }
-    // if (ui->editorDock->isVisible()){
-    // emit Mediator::instance()->onEditorReset();
-    // }
     ui->editorDock->show();
-    // editor->setupExistingPolygon(polygon);
     emit Mediator::instance()->onPolygonSelect(polygon);
 
 }

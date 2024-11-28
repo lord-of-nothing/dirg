@@ -60,6 +60,8 @@ private:
     QIcon saveIcon = style()->standardIcon(QStyle::SP_DialogApplyButton);
     QIcon resetIcon = style()->standardIcon(QStyle::SP_DialogCancelButton);
 
+    void load(); // testing
+
     const double minCoord = 0.0;
     const double maxCoord = 1000.0;
     const int precision = 3;

@@ -53,7 +53,8 @@ Editor::Editor(QWidget *parent)
     // vertex table empty row setup
     vtable->insertRow(0);
     QLineEdit* nameEdit = new QLineEdit(this);
-    nameEdit->setPlaceholderText("Name");
+    nameEdit->setPlaceholderText("V" + QString::number(polygonNumber) + "_" + QString::number(0));
+    // nameEdit->setPlaceholderText("Name");
     vtable->setCellWidget(0, 0, nameEdit);
 
     QDoubleSpinBox* xEdit = new QDoubleSpinBox(this);
@@ -77,15 +78,32 @@ Editor::Editor(QWidget *parent)
     connect(Mediator::instance(), &Mediator::onPolygonSelect, this, &Editor::onPolygonSelectReceived);
     connect(Mediator::instance(), &Mediator::onEditorReset, this, &Editor::resetEditor);
 
+    // testing
+    connect(ui->loadBtn, &QPushButton::released, this, &Editor::load);
+}
 
-    }
+void Editor::load() {
+    // testing polygon
+    // triangle
+    addVRow(0, "V0_0", 0.0, 0.0);
+    addVRow(1, "V0_1", 700.0, 500.0);
+    addVRow(2, "V0_2", 900.0, 100.0);
+    savePolygon();
+    // square
+    addVRow(0, "V1_0", 100.0, 100.0);
+    addVRow(1, "V1_1", 100.0, 400.0);
+    addVRow(2, "V1_2", 400.0, 400.0);
+    addVRow(3, "V1_3", 400.0, 100.0);
+    savePolygon();
+    ui->loadBtn->hide();
+}
 
-// void Editor::addVertexRow(int row, QString vName, double x, double y) {
 void Editor::addVRow(int row, QString vName, double x, double y) {
     // int row = vtable->rowCount() - 1;
 
     QLineEdit* nameEdit = new QLineEdit(this);
     nameEdit->insert(vName);
+    nameEdit->setPlaceholderText("V" + QString::number(polygonNumber) + "_" + QString::number(row));
     nameEdit->setEnabled(false);
 
     QDoubleSpinBox* xEdit = new QDoubleSpinBox(this);
@@ -124,15 +142,15 @@ void Editor::addVRow(int row, QString vName, double x, double y) {
     // edge table
     etable->insertRow(row);
     QLineEdit* edgeNameEdit = new QLineEdit(this);
-    edgeNameEdit->setPlaceholderText("Name");
-    edgeNameEdit->setText("E" + QString::number(polygonNumber) + "_" + QString::number(row));
+    QString defaultEdgeName = "E" + QString::number(polygonNumber) + "_" + QString::number(row);
+    edgeNameEdit->setPlaceholderText(defaultEdgeName);
+    edgeNameEdit->setText(defaultEdgeName);
     etable->setCellWidget(row, 0, edgeNameEdit);
     QComboBox* materialCombo = new QComboBox(this);
     materialCombo->addItems(materials);
     etable->setCellWidget(row, 1, materialCombo);
 
     buffer.append(QVector2D(x, y));
-
 }
 
 void Editor::addVertex() {
@@ -149,7 +167,7 @@ void Editor::addVertex() {
     double y = static_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 2))->value();
 
     // addVertexRow(row, name, x, y);
-     addVRow(row, name, x, y);
+    addVRow(row, name, x, y);
 
 }
 
@@ -206,7 +224,9 @@ void Editor::finishEditVertex(int row) {
 
 void Editor::clearNew() {
     int row = vtable->rowCount() - 1;
-    static_cast<QLineEdit*>(vtable->cellWidget(row, 0))->setText("");
+    QLineEdit* nameEdit = static_cast<QLineEdit*>(vtable->cellWidget(row, 0));
+    nameEdit->setText("");
+    nameEdit->setPlaceholderText("V" + QString::number(polygonNumber) + "_" + QString::number(row));
     static_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 1))->setValue(0);
     static_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 2))->setValue(0);
 }
@@ -288,7 +308,7 @@ void Editor::savePolygon() {
     //     mainWindow->removePolygon(id);
     // }
     // mainWindow->addPolygon(p);
-     emit Mediator::instance()->onPolygonSave(p, id.isNull());
+    emit Mediator::instance()->onPolygonSave(p, id.isNull());
     resetEditor();
 }
 
