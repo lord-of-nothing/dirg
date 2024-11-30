@@ -14,9 +14,11 @@ public:
     }
 
 signals:
-    // void bufferConnect(QVector<QVector2D>* data, Polygon* editedP);
-    // void polygonSelect(Polygon* polygon);
-    // void polygonAdd(Polygon* polygon);
+#if 0
+    void bufferConnect(QVector<QVector2D>* data, Polygon* editedP);
+    void polygonSelect(Polygon* polygon);
+    void polygonAdd(Polygon* polygon);
+#endif
     void onBufferConnect(QVector<QVector2D>* data, Polygon* editedP);
     void onPolygonSelect(Polygon* polygon);
     void onEditorReset();

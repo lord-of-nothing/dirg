@@ -11,6 +11,8 @@
 #include "area.h"
 #include "geometry.h"
 
+
+
 QVector<QString> materials{"1", "2", "3"};
 
 Editor::Editor(QWidget *parent)

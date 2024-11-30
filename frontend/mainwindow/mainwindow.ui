@@ -99,7 +99,6 @@
   <customwidget>
    <class>Area</class>
    <extends>QWidget</extends>
-   <header>../../../../area.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
