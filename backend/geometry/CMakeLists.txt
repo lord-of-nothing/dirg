@@ -7,9 +7,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCES 
 	geometry.cpp
+	vertex.cpp
 )
 set(HEADERS 
 	geometry.h
+	vertex.h
 )
 
 add_library(

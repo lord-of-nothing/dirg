@@ -8,45 +8,8 @@
 #include <QPair>
 #include <QHash>
 
-class Vertex {
-public:
-    Vertex() = default;
-    Vertex(double x, double y, QString name);
+#include "vertex.h"
 
-    QUuid generator_id_vertex();
-
-    double get_x();
-
-    double get_y();
-
-    QUuid get_id();
-
-    QString get_name();
-
-    QVector<QUuid> &get_edges();
-
-    QVector<QUuid> &get_polygons();
-
-    void add_edge(QUuid edge_id);
-
-    void remove_edge(QUuid edge_id);
-
-    void add_polygon(QUuid polygon_id);
-
-    void remove_polygon(QUuid polygon_id);
-
-    // void delete_vertex();
-
-private:
-    double x;
-    double y;
-    QUuid id;
-    QString name;
-    QVector<QUuid> polygons;
-    QVector<QUuid> edges;
-};
-
-inline QHash<QUuid, Vertex> all_vertices;
 inline QUuid shite;
 
 class Edge {

@@ -54,8 +54,8 @@ void Area::paintEvent(QPaintEvent* event) {
             Vertex& curV = all_vertices[vertices[i]];
             Vertex& nextV = all_vertices[vertices[(i + 1) % vertices.size()]];
 
-            painter.drawEllipse(QPointF(curV.get_x(), curV.get_y()), 3.0, 3.0);
-            painter.drawLine(QPointF(curV.get_x(), curV.get_y()), QPointF(nextV.get_x(), nextV.get_y()));
+            painter.drawEllipse(QPointF(curV.x(), curV.y()), 3.0, 3.0);
+            painter.drawLine(QPointF(curV.x(), curV.y()), QPointF(nextV.x(), nextV.y()));
         }
     }
     if (bufferData == nullptr || bufferData->size() == 0) {

@@ -285,7 +285,7 @@ void Editor::savePolygon() {
         double x = qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 1))->value();
         double y = qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 2))->value();
         Vertex v(x, y, vname);
-        vertices.append(v.get_id());
+        vertices.append(v.id());
     }
 
     // создаём рёбра
@@ -346,9 +346,9 @@ void Editor::setupExistingPolygon(Polygon* polygon) {
     // emit Mediator::instance()->onBufferConnect(&buffer, polygon);
     for (auto& vId : polygon->get_vertices()) {
         Vertex& v = all_vertices[vId];
-        QString vName = v.get_name();
-        double x = v.get_x();
-        double y = v.get_y();
+        QString vName = v.name();
+        double x = v.x();
+        double y = v.y();
         // addVertexRow(vtable->rowCount() - 1, vName, x, y);
         addVRow(vtable->rowCount() - 1, vName, x, y);
     }
