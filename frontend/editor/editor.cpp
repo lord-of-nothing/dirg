@@ -297,7 +297,7 @@ void Editor::savePolygon() {
         int property = qobject_cast<QComboBox*>(etable->cellWidget(row, 1))->currentText().toInt();
         Edge e(vertices[row], vertices[(row + 1) % etable->rowCount()],
                ename, property);
-        edges.append(e.get_id());
+        edges.append(e.id());
     }
 
     // где-то здесь должна быть проверка корректности
@@ -355,7 +355,7 @@ void Editor::setupExistingPolygon(Polygon* polygon) {
 
     for (auto& eId : polygon->get_edges()) {
         Edge& e = all_edges[eId];
-        QString eName = e.get_name();
+        QString eName = e.name();
         QString material = QString::number(e.get_property());
 
         qobject_cast<QLineEdit*>(etable->cellWidget(etable->rowCount() - 1, 0))->setText(eName);

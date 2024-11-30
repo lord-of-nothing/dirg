@@ -9,39 +9,7 @@
 #include <QHash>
 
 #include "vertex.h"
-
-inline QUuid shite;
-
-class Edge {
-public:
-    Edge() = default;
-    Edge(QUuid start, QUuid finish, QString name, int property);
-
-    QUuid generator_id_edge();
-
-    QUuid get_id();
-
-    QString get_name();
-
-    QVector<QUuid> &get_polygons();
-
-    QPair<QUuid, QUuid> get_coords();
-
-    void add_polygon(QUuid polygon_id);
-
-    void remove_polygon(QUuid polygon_id);
-
-    int get_property();
-
-private:
-    int property;
-    QUuid id;
-    QPair<QUuid, QUuid> coords{shite, shite};
-    QString name;
-    QVector<QUuid> polygons;
-};
-
-inline QHash<QUuid, Edge> all_edges;
+#include "edge.h"
 
 class Polygon {
 public:

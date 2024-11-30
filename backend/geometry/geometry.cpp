@@ -2,15 +2,6 @@
 #include <QRandomGenerator>
 #include <QUuid>
 
-QUuid Edge::generator_id_edge() {
-    QUuid uuid_str;
-    uuid_str = QUuid::createUuid();
-    while (all_edges.find(uuid_str) != all_edges.end()) {
-        uuid_str = QUuid::createUuid();
-    }
-    return uuid_str;
-}
-
 QUuid Polygon::generator_id_polygon() {
     QUuid uuid_str;
     uuid_str = QUuid::createUuid();
@@ -18,49 +9,6 @@ QUuid Polygon::generator_id_polygon() {
         uuid_str = QUuid::createUuid();
     }
     return uuid_str;
-}
-
-
-Edge::Edge(QUuid start, QUuid finish, QString name, int property) : property(property), coords({start, finish}), name(name) {
-    QUuid id = generator_id_edge();
-    this->id = id;
-    all_edges[id] = *this;
-    all_vertices[start].add_edge(id);
-    all_vertices[finish].add_edge(id);
-}
-
-QUuid Edge::get_id() {
-    return id;
-}
-
-QString Edge::get_name() {
-    return name;
-}
-
-QVector<QUuid> &Edge::get_polygons() {
-    return polygons;
-}
-
-QPair<QUuid, QUuid> Edge::get_coords() {
-    return coords;
-}
-
-void Edge::add_polygon(QUuid polygon_id) {
-    polygons.append(polygon_id);
-}
-
-int Edge::get_property() {
-    return property;
-}
-
-//эта штука сейчас не нужна, мб потом пригодится
-void Edge::remove_polygon(QUuid polygon_id) {
-    for (size_t i = 0; i < polygons.size(); i++) {
-        if (polygons[i] == polygon_id) {
-            polygons.erase(polygons.begin() + i);
-            break;
-        }
-    }
 }
 
 Polygon::Polygon(QVector<QUuid> &vertices, QVector<QUuid> &edges, QString name,
@@ -205,20 +153,20 @@ bool check_new_point(double first_x, double first_y, double second_x, double sec
     bool second_check = true;
 
     // for (auto& pair : all_edges) {
-    //     double old_first_x = all_vertices[pair.second.get_coords().first].x();
-    //     double old_first_y = all_vertices[pair.second.get_coords().first].y();
-    //     double old_second_x = all_vertices[pair.second.get_coords().second].x();
-    //     double old_second_y = all_vertices[pair.second.get_coords().second].y();
+    //     double old_first_x = all_vertices[pair.second.coords().first].x();
+    //     double old_first_y = all_vertices[pair.second.coords().first].y();
+    //     double old_second_x = all_vertices[pair.second.coords().second].x();
+    //     double old_second_y = all_vertices[pair.second.coords().second].y();
     //     if (check_intersect(old_first_x, old_first_y, old_second_x, old_second_y, second_x, second_y, third_x, third_y) == false) {
     //         second_check = false;
     //     }
     // }
 
     for (auto pair = all_edges.begin(); pair != all_edges.end(); ++pair) {
-        double old_first_x = all_vertices[pair.value().get_coords().first].x();
-        double old_first_y = all_vertices[pair.value().get_coords().first].y();
-        double old_second_x = all_vertices[pair.value().get_coords().second].x();
-        double old_second_y = all_vertices[pair.value().get_coords().second].y();
+        double old_first_x = all_vertices[pair.value().coords().first].x();
+        double old_first_y = all_vertices[pair.value().coords().first].y();
+        double old_second_x = all_vertices[pair.value().coords().second].x();
+        double old_second_y = all_vertices[pair.value().coords().second].y();
         if (check_intersect(old_first_x, old_first_y, old_second_x, old_second_y, second_x, second_y, third_x, third_y) == false) {
             second_check = false;
         }
@@ -232,7 +180,7 @@ bool point_in_polygon(double x, double y, QUuid polygon_id){
     double vector_y = 40000 + QRandomGenerator::global()->bounded(0, 2000);
     int count_intersection = 0;
     for (auto& edge : all_polygons[polygon_id].get_edges()) {
-        if (check_intersect(x, y, vector_x, vector_y, all_vertices[all_edges[edge].get_coords().first].x(), all_vertices[all_edges[edge].get_coords().first].y(), all_vertices[all_edges[edge].get_coords().second].x(), all_vertices[all_edges[edge].get_coords().second].y())) {
+        if (check_intersect(x, y, vector_x, vector_y, all_vertices[all_edges[edge].coords().first].x(), all_vertices[all_edges[edge].coords().first].y(), all_vertices[all_edges[edge].coords().second].x(), all_vertices[all_edges[edge].coords().second].y())) {
             count_intersection++;
         }
     }
@@ -274,20 +222,20 @@ bool isConvex(QVector<QPair<double, double>> vertices) {
 bool isNotIntersecting(QVector<std::pair<double, double>> vertices) {
     for (int i = 0; i < vertices.size(); i++) {
         // for (auto& pair : all_edges) {
-        //     double old_first_x = all_vertices[pair.second.get_coords().first].x();
-        //     double old_first_y = all_vertices[pair.second.get_coords().first].y();
-        //     double old_second_x = all_vertices[pair.second.get_coords().second].x();
-        //     double old_second_y = all_vertices[pair.second.get_coords().second].y();
+        //     double old_first_x = all_vertices[pair.second.coords().first].x();
+        //     double old_first_y = all_vertices[pair.second.coords().first].y();
+        //     double old_second_x = all_vertices[pair.second.coords().second].x();
+        //     double old_second_y = all_vertices[pair.second.coords().second].y();
         //     if (check_intersect(old_first_x, old_first_y, old_second_x, old_second_y, vertices[i].first, vertices[i].second, vertices[(i + 1) % vertices.size()].first, vertices[(i + 1) % vertices.size()].second)) {
         //         return false;
         //     }
         // }
 
         for (auto pair = all_edges.begin(); pair != all_edges.end(); ++pair) {
-            double old_first_x = all_vertices[pair.value().get_coords().first].x();
-            double old_first_y = all_vertices[pair.value().get_coords().first].y();
-            double old_second_x = all_vertices[pair.value().get_coords().second].x();
-            double old_second_y = all_vertices[pair.value().get_coords().second].y();
+            double old_first_x = all_vertices[pair.value().coords().first].x();
+            double old_first_y = all_vertices[pair.value().coords().first].y();
+            double old_second_x = all_vertices[pair.value().coords().second].x();
+            double old_second_y = all_vertices[pair.value().coords().second].y();
             if (check_intersect(old_first_x, old_first_y, old_second_x, old_second_y, vertices[i].first, vertices[i].second, vertices[(i + 1) % vertices.size()].first, vertices[(i + 1) % vertices.size()].second)) {
                 return false;
             }

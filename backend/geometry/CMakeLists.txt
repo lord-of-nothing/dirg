@@ -8,15 +8,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SOURCES 
 	geometry.cpp
 	vertex.cpp
+	edge.cpp
 )
+
 set(HEADERS 
 	geometry.h
 	vertex.h
+	edge.h
 )
 
 add_library(
 	${PROJECT_NAME} 
-	STATIC 
+	SHARED 
 	${SOURCES}
 	${HEADERS}
 )

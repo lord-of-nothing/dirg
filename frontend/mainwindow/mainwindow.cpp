@@ -77,7 +77,7 @@ void MainWindow::addPolygon(Polygon* polygon) {
     }
     for (auto& edge : polygon->get_edges()) {
         QTreeWidgetItem* e = new QTreeWidgetItem(edgeFolder);
-        e->setText(0, all_edges[edge].get_name());
+        e->setText(0, all_edges[edge].name());
     }
 }
 
