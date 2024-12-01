@@ -13,7 +13,7 @@ Area::Area(QWidget *parent) : QWidget{parent} {
 			&Area::onBufferConnectReceived);
 }
 
-void Area::paintEvent(QPaintEvent *event) {
+void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 	// qWarning() << "paint";
 	QPainter painter(this);
 	painter.begin(this);
@@ -44,7 +44,6 @@ void Area::paintEvent(QPaintEvent *event) {
 
 	for (auto polygons = all_polygons.begin(); polygons != all_polygons.end();
 		 ++polygons) {
-		QUuid id = polygons.key();
 		Polygon &polygon = polygons.value();
 		if (edited == &polygon) {
 			continue;

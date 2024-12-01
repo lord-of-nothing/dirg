@@ -33,11 +33,11 @@ public:
 	QVector<QUuid> vertices;
 
 private:
+	QString name_;
 	static inline int total_polygon_number = 0;
 	int cur_polygon_number_;
+	[[maybe_unused]] int material_;
 	QUuid id_;
-	QString name_;
-	int material_;
 };
 
 inline QHash<QUuid, Polygon> all_polygons;

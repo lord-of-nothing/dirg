@@ -261,9 +261,13 @@ void Editor::updateTableSize() {
 	etable->setColumnWidth(1, tableWidth * 0.5);
 }
 
-void Editor::showEvent(QShowEvent *event) { updateTableSize(); }
+void Editor::showEvent([[maybe_unused]] QShowEvent *event) {
+	updateTableSize();
+}
 
-void Editor::resizeEvent(QResizeEvent *event) { updateTableSize(); }
+void Editor::resizeEvent([[maybe_unused]] QResizeEvent *event) {
+	updateTableSize();
+}
 
 void Editor::onBufferConnect() {
 	// emit Mediator::instance()->bufferConnect(&buffer, editedPolygon);

@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
 			&MainWindow::newPolygon);
 	// connect(ui->tree, &QTreeWidget::itemClicked, this, onIte);
 	connect(ui->tree, &QTreeWidget::itemDoubleClicked,
-			[this](QTreeWidgetItem *item, int column) {
+			[this](QTreeWidgetItem *item, [[maybe_unused]] int column) {
 				QUuid id = item->data(0, Qt::UserRole).value<QUuid>();
 				selectPolygon(id);
 			});
