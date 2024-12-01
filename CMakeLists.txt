@@ -9,5 +9,22 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(cmake/clang_format.cmake)
+include(cmake/clang_tidy.cmake)
+
+add_format_target()
+add_tidy_target()
+
+if(NOT WIN32)
+    set(WIN32 0)
+endif()
+
+# compiler options build everywhere cpp sample but other functions clang only because of using llvm
+if(MSVC)
+    add_compile_options("/W3" "$<$<CONFIG:RELEASE>:/O2>")
+else()
+    add_compile_options("-Wall" "-Wextra" "$<$<CONFIG:RELEASE>:-O2>")
+endif()
+
 add_subdirectory(backend)
 add_subdirectory(frontend)

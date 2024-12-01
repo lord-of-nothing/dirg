@@ -31,13 +31,18 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tree->setSortingEnabled(true);
     ui->tree->sortByColumn(0, Qt::AscendingOrder);
 
-    setWindowTitle("Grid Editor");
-    setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+	setWindowTitle("Grid Editor");
+	setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
 
+	QColor gray(229, 228, 226);
+	QPalette pal = QPalette();
+	pal.setColor(QPalette::Window, gray);
 
-    QColor gray(229, 228, 226);
-    QPalette pal = QPalette();
-    pal.setColor(QPalette::Window, gray);
+	ui->editorDock->setAutoFillBackground(true);
+	ui->editorDock->setPalette(pal);
+	ui->treeDock->setAutoFillBackground(true);
+	ui->treeDock->setPalette(pal);
+
 
     ui->editorDock->setAutoFillBackground(true);
     ui->editorDock->setPalette(pal);
@@ -57,10 +62,10 @@ void MainWindow::addPolygon(Polygon* polygon) {
     polyItem->setText(0, polygon->name());
     polyItem->setData(0, Qt::UserRole, QVariant::fromValue(polygon->id()));
 
-    QTreeWidgetItem* vertexFolder = new QTreeWidgetItem(polyItem);
-    vertexFolder->setText(0, "Vertices");
-    QTreeWidgetItem* edgeFolder = new QTreeWidgetItem(polyItem);
-    edgeFolder->setText(0, "Edges");
+	QTreeWidgetItem *vertexFolder = new QTreeWidgetItem(polyItem);
+	vertexFolder->setText(0, "Vertices");
+	QTreeWidgetItem *edgeFolder = new QTreeWidgetItem(polyItem);
+	edgeFolder->setText(0, "Edges");
 
     for (auto& vertex : polygon->vertices) {
         QTreeWidgetItem* v = new QTreeWidgetItem(vertexFolder);
@@ -72,31 +77,27 @@ void MainWindow::addPolygon(Polygon* polygon) {
     }
 }
 
-
 void MainWindow::removePolygon(QUuid id) {
-    QVariant target = QVariant::fromValue(id);
-    int count = ui->tree->topLevelItemCount();
-    // Проходим по всем дочерним элементам первого уровня
-    for (int i = 0; i < count; ++i) {
-        QTreeWidgetItem *item = ui->tree->takeTopLevelItem(0);  // Убираем первый элемент
-        if (item->data(0, Qt::UserRole) == target) {
-            delete item; // Удаляем поддерево
-            return; // После удаления выходим
-        }
-    }
+	QVariant target = QVariant::fromValue(id);
+	int count = ui->tree->topLevelItemCount();
+	// Проходим по всем дочерним элементам первого уровня
+	for (int i = 0; i < count; ++i) {
+		QTreeWidgetItem *item =
+			ui->tree->takeTopLevelItem(0); // Убираем первый элемент
+		if (item->data(0, Qt::UserRole) == target) {
+			delete item; // Удаляем поддерево
+			return;		 // После удаления выходим
+		}
+	}
 }
 
 void MainWindow::selectPolygon(QUuid id) {
-    if (id.isNull()) {
-        return;
-    }
-    Polygon* polygon = &all_polygons[id];
-    ui->editorDock->show();
-    emit Mediator::instance()->onPolygonSelect(polygon);
-
+	if (id.isNull()) {
+		return;
+	}
+	Polygon *polygon = &all_polygons[id];
+	ui->editorDock->show();
+	emit Mediator::instance() -> onPolygonSelect(polygon);
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
+MainWindow::~MainWindow() { delete ui; }
