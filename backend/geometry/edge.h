@@ -18,10 +18,10 @@ public:
 
 	static QUuid gen_uuid() ;
 
-	inline auto id() const { return id_; };
-	inline auto &name() const { return name_; };
-	inline auto &coords() const { return coords_; };
-	inline auto get_property() const { return property_; };
+	inline auto id() const { return id_; }
+	inline auto &name() const { return name_; }
+	inline auto &coords() const { return coords_; }
+	inline auto get_property() const { return property_; }
 
 	inline void add_polygon(const QUuid &polygon_id) {
 		polygons.append(polygon_id);

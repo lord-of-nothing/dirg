@@ -270,8 +270,8 @@ void Editor::savePolygon() {
     QString name = "P" + QString::number(polygonNumber);
     QUuid id;
     if (editedPolygon != nullptr) {
-        name = editedPolygon->get_name();
-        id = editedPolygon->get_id();
+        name = editedPolygon->name();
+        id = editedPolygon->id();
         editedPolygon->delete_polygon();
         editedPolygon = nullptr;
     }
@@ -342,9 +342,9 @@ void Editor::onPolygonSelectReceived(Polygon* polygon) {
 
 void Editor::setupExistingPolygon(Polygon* polygon) {
     editedPolygon = polygon;
-    polygonNumber = editedPolygon->get_number();
+    polygonNumber = editedPolygon->number();
     // emit Mediator::instance()->onBufferConnect(&buffer, polygon);
-    for (auto& vId : polygon->get_vertices()) {
+    for (auto& vId : polygon->vertices) {
         Vertex& v = all_vertices[vId];
         QString vName = v.name();
         double x = v.x();
@@ -353,7 +353,7 @@ void Editor::setupExistingPolygon(Polygon* polygon) {
         addVRow(vtable->rowCount() - 1, vName, x, y);
     }
 
-    for (auto& eId : polygon->get_edges()) {
+    for (auto& eId : polygon->edges) {
         Edge& e = all_edges[eId];
         QString eName = e.name();
         QString material = QString::number(e.get_property());

@@ -48,7 +48,7 @@ void Area::paintEvent(QPaintEvent* event) {
         if (edited == &polygon) {
             continue;
         }
-        QVector<QUuid>& vertices = polygon.get_vertices();
+        QVector<QUuid>& vertices = polygon.vertices;
         qWarning() << vertices.size();
         for (int i = 0; i < vertices.size(); ++i) {
             Vertex& curV = all_vertices[vertices[i]];

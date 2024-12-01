@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(Mediator::instance(), &Mediator::onPolygonSave, this, [this] (Polygon* polygon, bool isNew) {
         if (!isNew) {
-            removePolygon(polygon->get_id());
+            removePolygon(polygon->id());
         }
         addPolygon(polygon);
     });
@@ -45,37 +45,28 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeDock->setPalette(pal);
 
     setStyleSheet("QMainWindow::separator{ width: 0px; height: 0px; }");
-    // setDockOptions(QMainWindow::GroupedDockWidgets);
 }
 
 void MainWindow::newPolygon() {
-    // if (ui->editorDock->isVisible()){
-    //     Editor* editor = qobject_cast<Editor*>(ui->editorDock->widget());
-    //     editor->resetEditor();
-    // }
-    // if (ui->editorDock->isVisible()){
-    // emit Mediator::instance()->onEditorReset();
-    // }
     emit Mediator::instance()->onEditorReset();
     ui->editorDock->show();
 }
 
 void MainWindow::addPolygon(Polygon* polygon) {
     QTreeWidgetItem* polyItem = new QTreeWidgetItem(ui->tree);
-    polyItem->setText(0, polygon->get_name());
-    polyItem->setData(0, Qt::UserRole, QVariant::fromValue(polygon->get_id()));
-    // connect(polyItem, &QTreeWidget::itemClicked, this, [this, polygon](){selectPolygon(polygon);})
+    polyItem->setText(0, polygon->name());
+    polyItem->setData(0, Qt::UserRole, QVariant::fromValue(polygon->id()));
 
     QTreeWidgetItem* vertexFolder = new QTreeWidgetItem(polyItem);
     vertexFolder->setText(0, "Vertices");
     QTreeWidgetItem* edgeFolder = new QTreeWidgetItem(polyItem);
     edgeFolder->setText(0, "Edges");
 
-    for (auto& vertex : polygon->get_vertices()) {
+    for (auto& vertex : polygon->vertices) {
         QTreeWidgetItem* v = new QTreeWidgetItem(vertexFolder);
         v->setText(0, all_vertices[vertex].name());
     }
-    for (auto& edge : polygon->get_edges()) {
+    for (auto& edge : polygon->edges) {
         QTreeWidgetItem* e = new QTreeWidgetItem(edgeFolder);
         e->setText(0, all_edges[edge].name());
     }
