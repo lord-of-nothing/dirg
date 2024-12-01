@@ -23,6 +23,17 @@ qt_add_executable(${PROJECT_NAME}
 	${UI_HEADERS}
 )
 
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set_target_properties(${PROJECT_NAME} PROPERTIES AUTOGEN_ORIGIN_DEPENDS OFF)
+
+add_custom_target(run
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND ${CMAKE_BINARY_DIR}/bin/${PROJECT_NAME}$<IF:${WIN32},.exe,>
+)
+
+add_dependencies(run ${PROJECT_NAME})
+
 target_link_libraries(
 	${PROJECT_NAME} 
 	PRIVATE 

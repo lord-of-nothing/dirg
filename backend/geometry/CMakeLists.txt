@@ -19,6 +19,8 @@ add_library(
 	${HEADERS}
 )
 
+set_target_properties(${PROJECT_NAME} PROPERTIES AUTOMOC OFF AUTOUIC OFF)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core)
 target_include_directories(${PROJECT_NAME} PUBLIC .)
 
