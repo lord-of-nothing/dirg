@@ -24,6 +24,11 @@ signals:
 	void onEditorReset();
 	void onPolygonSave(Polygon *polygon, bool isNew);
 
+	void addNewVertex(QPoint *point);
+	void editVertexMouse(int row);
+	void editVertexCoordMouse(int row, QPoint *new_coord);
+	void saveVertexMouse(int row);
+
 private:
 	Mediator() {}
 };
@@ -36,12 +41,20 @@ public:
 protected:
 	void paintEvent(QPaintEvent *event) override;
 	void mousePressEvent(QMouseEvent *event) override;
+	void mouseMoveEvent(QMouseEvent *event) override;
+	void mouseReleaseEvent(QMouseEvent *event) override;
+
 private slots:
 	void onBufferConnectReceived(QVector<QVector2D> *data, Polygon *editedP);
 
 private:
 	QVector<QVector2D> *bufferData = nullptr;
 	Polygon *edited;
+
+	int draggingVertex =
+		-1;			   // Index of dragged vertex (-1 if no vertex is dragged)
+	QPoint dragOffset; // Cursor offset relative to the vertex at the start of
+					   // dragging
 };
 
 #endif // AREA_H

@@ -32,9 +32,16 @@ private slots:
 	void onBufferConnect();
 	void onPolygonSelectReceived(Polygon *polygon);
 
+	void addVertex();
+	void load(); // testing
+
+	void addVertexByMouse(QPoint *point); // add new point
+	void editVertexCoord(
+		int row,
+		QPoint *new_coord); // change coord for vertex when move by mouse
+
 private:
 	void updateTableSize();
-	void addVertex();
 	// void addVertexRow(int row, QString vName, double x, double y);
 	void addVRow(int row, QString vName, double x, double y);
 	void saveVertex(int row);
@@ -59,8 +66,6 @@ private:
 	QIcon editIcon = style()->standardIcon(QStyle::SP_ArrowBack);
 	QIcon saveIcon = style()->standardIcon(QStyle::SP_DialogApplyButton);
 	QIcon resetIcon = style()->standardIcon(QStyle::SP_DialogCancelButton);
-
-	void load(); // testing
 
 	const double minCoord = 0.0;
 	const double maxCoord = 1000.0;

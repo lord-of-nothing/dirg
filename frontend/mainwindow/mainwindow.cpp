@@ -1,18 +1,21 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "editor.h"
+
 #include <QPalette>
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent), ui(new Ui::MainWindow) {
 	ui->setupUi(this);
-	ui->editorDock->setWidget(new Editor(ui->editorDock));
+
+	ui->editorDock->setWidget(new Editor(ui->editorDock)); // ??
 	connect(ui->editorDock, &QDockWidget::visibilityChanged, this, [this]() {
 		if (!ui->editorDock->isVisible()) {
 			emit Mediator::instance() -> onEditorReset();
 		}
 	});
 	ui->editorDock->close();
+
 	ui->tree->setHeaderHidden(true);
 	connect(ui->newPolygonBtn, &QPushButton::released, this,
 			&MainWindow::newPolygon);
@@ -45,6 +48,14 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->treeDock->setPalette(pal);
 
 	setStyleSheet("QMainWindow::separator{ width: 0px; height: 0px; }");
+	// setDockOptions(QMainWindow::GroupedDockWidgets);
+
+	// Exit by Ctrl+Q
+	auto actionClose = new QAction();
+	actionClose->setShortcut(QKeySequence::Quit);
+	addAction(actionClose);
+	QObject::connect(actionClose, &QAction::triggered, this,
+					 &QCoreApplication::quit);
 }
 
 void MainWindow::newPolygon() {
