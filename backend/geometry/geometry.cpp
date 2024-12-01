@@ -3,7 +3,6 @@
 #include <QRandomGenerator>
 #include <QUuid>
 
-
 bool check_convex(double first_x, double first_y, double second_x, double second_y, double third_x, double third_y) {
 	QPair<double, double> first_vector(second_x - first_x, second_y - first_y);
 	QPair<double, double> second_vector(third_x - second_x, third_y - second_y);
@@ -13,7 +12,6 @@ bool check_convex(double first_x, double first_y, double second_x, double second
 
 double area(double first_x, double first_y, double second_x, double second_y, double third_x, double third_y) {
 	return (second_x - first_x) * (third_y - first_y) - (second_y - first_y) * (third_x - first_x);
-
 }
 
 bool intersect(double a, double b, double c, double d) {
@@ -43,7 +41,6 @@ bool check_new_point(double first_x, double first_y, double second_x, double sec
 		double old_second_x = all_vertices[pair.value().coords().second].x();
 		double old_second_y = all_vertices[pair.value().coords().second].y();
 		if (check_intersect(old_first_x, old_first_y, old_second_x, old_second_y, second_x, second_y, third_x, third_y) == false) {
-
 			second_check = false;
 		}
 	}

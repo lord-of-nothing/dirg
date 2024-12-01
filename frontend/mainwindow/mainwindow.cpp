@@ -38,12 +38,6 @@ MainWindow::MainWindow(QWidget *parent)
 	QPalette pal = QPalette();
 	pal.setColor(QPalette::Window, gray);
 
-	ui->editorDock->setAutoFillBackground(true);
-	ui->editorDock->setPalette(pal);
-	ui->treeDock->setAutoFillBackground(true);
-	ui->treeDock->setPalette(pal);
-
-
     ui->editorDock->setAutoFillBackground(true);
     ui->editorDock->setPalette(pal);
     ui->treeDock->setAutoFillBackground(true);
