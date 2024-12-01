@@ -8,118 +8,9 @@
 #include <QVector>
 #include <map>
 
-class Vertex {
-public:
-	Vertex() = default;
-	Vertex(double x, double y, QString name);
-
-	QUuid generator_id_vertex();
-
-	double get_x();
-
-	double get_y();
-
-	QUuid get_id();
-
-	QString get_name();
-
-	QVector<QUuid> &get_edges();
-
-	QVector<QUuid> &get_polygons();
-
-	void add_edge(QUuid edge_id);
-
-	void remove_edge(QUuid edge_id);
-
-	void add_polygon(QUuid polygon_id);
-
-	void remove_polygon(QUuid polygon_id);
-
-	// void delete_vertex();
-
-private:
-	double x;
-	double y;
-	QUuid id;
-	QString name;
-	QVector<QUuid> polygons;
-	QVector<QUuid> edges;
-};
-
-inline QHash<QUuid, Vertex> all_vertices;
-inline QUuid shite;
-
-class Edge {
-public:
-	Edge() = default;
-	Edge(QUuid start, QUuid finish, QString name, int property);
-
-	QUuid generator_id_edge();
-
-	QUuid get_id();
-
-	QString get_name();
-
-	QVector<QUuid> &get_polygons();
-
-	QPair<QUuid, QUuid> get_coords();
-
-	void add_polygon(QUuid polygon_id);
-
-	void remove_polygon(QUuid polygon_id);
-
-	int get_property();
-
-private:
-	int property;
-	QUuid id;
-	QPair<QUuid, QUuid> coords{shite, shite};
-	QString name;
-	QVector<QUuid> polygons;
-};
-
-inline QHash<QUuid, Edge> all_edges;
-
-class Polygon {
-public:
-	Polygon() = default;
-	Polygon(QVector<QUuid> &vertices, QVector<QUuid> &edges, QString name,
-			int material, int existingNumber = -1, QUuid existingId = QUuid());
-
-	QUuid generator_id_polygon();
-
-	QUuid get_id();
-
-	QString get_name();
-
-	QVector<QUuid> &get_vertices();
-
-	QVector<QUuid> &get_edges();
-
-	QUuid next_vertex(QUuid current_vertex);
-
-	QUuid next_edge(QUuid current_edge);
-
-	QUuid previous_edge(QUuid current_edge);
-
-	QUuid previous_vertex(QUuid current_vertex);
-
-	void delete_polygon();
-
-	static int get_polygons_total();
-	int get_number();
-
-private:
-	inline static int total_polygon_number = 0;
-	int cur_polygon_number;
-	QUuid id;
-	QString name;
-	QVector<QUuid> edges;
-	QVector<QUuid> vertices;
-	int material;
-};
-
-inline QHash<QUuid, Polygon> all_polygons;
+#include "vertex.h"
+#include "edge.h"
+#include "polygon.h"
 
 bool check_new_point(double first_x, double first_y, double second_x,
 					 double second_y, double third_x, double third_y);
@@ -139,4 +30,4 @@ bool isConvex(QVector<QPair<double, double>> vertices);
 bool isNotIntersecting(QVector<QPair<double, double>> vertices);
 bool checkPolygon(QVector<QPair<double, double>> vertices);
 
-#endif // GEOMETRY_H
+#endif

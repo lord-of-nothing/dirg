@@ -42,27 +42,25 @@ void Area::paintEvent(QPaintEvent *event) {
 	//     }
 	// }
 
-	for (auto polygons = all_polygons.begin(); polygons != all_polygons.end();
-		 ++polygons) {
-		QUuid id = polygons.key();
-		Polygon &polygon = polygons.value();
-		if (edited == &polygon) {
-			continue;
-		}
-		QVector<QUuid> &vertices = polygon.get_vertices();
-		qWarning() << vertices.size();
-		for (int i = 0; i < vertices.size(); ++i) {
-			Vertex &curV = all_vertices[vertices[i]];
-			Vertex &nextV = all_vertices[vertices[(i + 1) % vertices.size()]];
+    for (auto polygons =  all_polygons.begin(); polygons !=  all_polygons.end(); ++polygons) {
+        QUuid id = polygons.key();
+        Polygon& polygon = polygons.value();
+        if (edited == &polygon) {
+            continue;
+        }
+        QVector<QUuid>& vertices = polygon.vertices;
+        qWarning() << vertices.size();
+        for (int i = 0; i < vertices.size(); ++i) {
+            Vertex& curV = all_vertices[vertices[i]];
+            Vertex& nextV = all_vertices[vertices[(i + 1) % vertices.size()]];
 
-			painter.drawEllipse(QPointF(curV.get_x(), curV.get_y()), 3.0, 3.0);
-			painter.drawLine(QPointF(curV.get_x(), curV.get_y()),
-							 QPointF(nextV.get_x(), nextV.get_y()));
-		}
-	}
-	if (bufferData == nullptr || bufferData->size() == 0) {
-		return;
-	}
+            painter.drawEllipse(QPointF(curV.x(), curV.y()), 3.0, 3.0);
+            painter.drawLine(QPointF(curV.x(), curV.y()), QPointF(nextV.x(), nextV.y()));
+        }
+    }
+    if (bufferData == nullptr || bufferData->size() == 0) {
+        return;
+    }
 
 	// brush.setColor(Qt::red);
 	painter.setBrush(Qt::red);
