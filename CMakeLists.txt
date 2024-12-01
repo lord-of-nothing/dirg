@@ -10,8 +10,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(cmake/clang_format.cmake)
+include(cmake/clang_tidy.cmake)
 
 add_format_target()
+add_tidy_target()
 
 if(NOT WIN32)
     set(WIN32 0)

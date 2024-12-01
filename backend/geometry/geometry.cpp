@@ -135,8 +135,8 @@ void Edge::remove_polygon(QUuid polygon_id) {
 
 Polygon::Polygon(QVector<QUuid> &vertices, QVector<QUuid> &edges, QString name,
 				 int material, int existingNumber, QUuid existingId)
-	: name(name), edges(edges), vertices(vertices), material(material),
-	  cur_polygon_number(existingNumber) {
+	: cur_polygon_number(existingNumber), name(name), edges(edges),
+	  vertices(vertices), material(material) {
 	if (existingId.isNull()) {
 		id = generator_id_polygon();
 	} else {
