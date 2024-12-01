@@ -29,21 +29,23 @@ protected:
 	void resizeEvent(QResizeEvent *event) override;
 
 private slots:
-	void onBufferConnect();
-	void onPolygonSelectReceived(Polygon *polygon);
+    void onBufferConnect();
+    void onPolygonSelectReceived(Polygon* polygon);
+    
+    void addVertex();
+    void load(); // testing
 
 private:
-	void updateTableSize();
-	void addVertex();
-	// void addVertexRow(int row, QString vName, double x, double y);
-	void addVRow(int row, QString vName, double x, double y);
-	void saveVertex(int row);
-	void resetVertex(int row);
-	void finishEditVertex(int row);
-	void editVertex(int row);
-	void clearNew();
-	void savePolygon();
-	void resetEditor();
+    void updateTableSize();
+    // void addVertexRow(int row, QString vName, double x, double y);
+    void addVRow(int row, QString vName, double x, double y);
+    void saveVertex(int row);
+    void resetVertex(int row);
+    void finishEditVertex(int row);
+    void editVertex(int row);
+    void clearNew();
+    void savePolygon();
+    void resetEditor();
 
 	Ui::Editor *ui;
 	QTableWidget *vtable;
@@ -60,7 +62,6 @@ private:
 	QIcon saveIcon = style()->standardIcon(QStyle::SP_DialogApplyButton);
 	QIcon resetIcon = style()->standardIcon(QStyle::SP_DialogCancelButton);
 
-	void load(); // testing
 
 	const double minCoord = 0.0;
 	const double maxCoord = 1000.0;

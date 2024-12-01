@@ -1,15 +1,16 @@
 #include "editor.h"
 #include "ui_editor.h"
-#include <QComboBox>
-#include <QDoubleSpinBox>
+
+#include "area.h"
+#include "geometry.h"
+
 #include <QLineEdit>
 #include <QPushButton>
 #include <QStackedLayout>
 #include <QStringList>
 #include <QVector>
-
-#include "area.h"
-#include "geometry.h"
+#include <QDoubleSpinBox>
+#include <QComboBox>
 
 QVector<QString> materials{"1", "2", "3"};
 
@@ -20,27 +21,28 @@ Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 	vtable = ui->vertexTable;
 	etable = ui->edgeTable;
 
-	vtable->setColumnCount(5);
-	vtable->setHorizontalHeaderLabels(QStringList()
-									  << "Name" << "X" << "Y" << "" << "");
-	vtable->horizontalHeader()->setSectionsClickable(false);
-	vtable->horizontalHeader()->setSectionsMovable(false);
-	vtable->horizontalHeader()->setStyleSheet("QHeaderView::section {"
-											  "    border: none;"
-											  "}");
-	vtable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // vertexTable setUp
+    vtable->setColumnCount(5);
+    vtable->setHorizontalHeaderLabels(QStringList() << "Name" << "X" << "Y" << "" << "");
+    vtable->horizontalHeader()->setSectionsClickable(false);
+    vtable->horizontalHeader()->setSectionsMovable(false);
+    vtable->horizontalHeader()->setStyleSheet("QHeaderView::section {"
+                                                  "    border: none;"
+                                                  "}");
+    vtable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-	etable->setColumnCount(2);
-	etable->setHorizontalHeaderLabels(QStringList() << "Name" << "Property");
-	etable->horizontalHeader()->setSectionsClickable(false);
-	etable->horizontalHeader()->setSectionsMovable(false);
-	etable->horizontalHeader()->setStyleSheet("QHeaderView::section {"
-											  "    border: none;"
-											  "}");
-	etable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // edgeTable setUp
+    etable->setColumnCount(2);
+    etable->setHorizontalHeaderLabels(QStringList() << "Name" << "Property");
+    etable->horizontalHeader()->setSectionsClickable(false);
+    etable->horizontalHeader()->setSectionsMovable(false);
+    etable->horizontalHeader()->setStyleSheet("QHeaderView::section {"
+                                                  "    border: none;"
+                                                  "}");
+    etable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-	connect(ui->confirmBtn, &QPushButton::released, this, &Editor::savePolygon);
-	connect(ui->cancelBtn, &QPushButton::released, this, &Editor::resetEditor);
+    connect(ui->confirmBtn, &QPushButton::released, this, &Editor::savePolygon);
+    connect(ui->cancelBtn,  &QPushButton::released, this, &Editor::resetEditor);
 
 	setStyleSheet("QDoubleSpinBox::up-button { width: 0; height: 0; }"
 				  "QDoubleSpinBox::down-button { width: 0; height: 0; }"
@@ -82,6 +84,7 @@ Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 	connect(ui->loadBtn, &QPushButton::released, this, &Editor::load);
 }
 
+// Slot for create two testing polygons
 void Editor::load() {
 	// testing polygon
 	// triangle
@@ -98,20 +101,21 @@ void Editor::load() {
 	ui->loadBtn->hide();
 }
 
+// Add Row for Vertex and Edge table
 void Editor::addVRow(int row, QString vName, double x, double y) {
 	// int row = vtable->rowCount() - 1;
 
-	QLineEdit *nameEdit = new QLineEdit(this);
-	nameEdit->insert(vName);
-	nameEdit->setPlaceholderText("V" + QString::number(polygonNumber) + "_" +
-								 QString::number(row));
-	nameEdit->setEnabled(false);
+    QLineEdit* nameEdit = new QLineEdit(this);
+    nameEdit->insert(vName);
+    nameEdit->setPlaceholderText("V" + QString::number(polygonNumber) + "_" + QString::number(row)); // Зачем нужна эта строчка, перед ней сразу заполняется текст?
+    nameEdit->setEnabled(false);
 
-	QDoubleSpinBox *xEdit = new QDoubleSpinBox(this);
-	xEdit->setRange(minCoord, maxCoord);
-	xEdit->setDecimals(precision);
-	xEdit->setValue(x);
-	xEdit->setEnabled(false);
+
+    QDoubleSpinBox* xEdit = new QDoubleSpinBox(this);
+    xEdit->setRange(minCoord, maxCoord);
+    xEdit->setDecimals(precision);
+    xEdit->setValue(x);
+    xEdit->setEnabled(false);
 
 	QDoubleSpinBox *yEdit = new QDoubleSpinBox(this);
 	yEdit->setRange(minCoord, maxCoord);
@@ -142,21 +146,21 @@ void Editor::addVRow(int row, QString vName, double x, double y) {
 
 	clearNew();
 
-	// edge table
-	etable->insertRow(row);
-	QLineEdit *edgeNameEdit = new QLineEdit(this);
-	QString defaultEdgeName =
-		"E" + QString::number(polygonNumber) + "_" + QString::number(row);
-	edgeNameEdit->setPlaceholderText(defaultEdgeName);
-	edgeNameEdit->setText(defaultEdgeName);
-	etable->setCellWidget(row, 0, edgeNameEdit);
-	QComboBox *materialCombo = new QComboBox(this);
-	materialCombo->addItems(materials);
-	etable->setCellWidget(row, 1, materialCombo);
+    // edge table
+    etable->insertRow(row);
+    QLineEdit* edgeNameEdit = new QLineEdit(this);
+    QString defaultEdgeName = "E" + QString::number(polygonNumber) + "_" + QString::number(row);
+    edgeNameEdit->setPlaceholderText(defaultEdgeName); // Зачем нужна эта строчка, дальше идет сразу заполняется текст?
+    edgeNameEdit->setText(defaultEdgeName);
+    etable->setCellWidget(row, 0, edgeNameEdit);
+    QComboBox* materialCombo = new QComboBox(this);
+    materialCombo->addItems(materials);
+    etable->setCellWidget(row, 1, materialCombo);
 
 	buffer.append(QVector2D(x, y));
 }
 
+// Slot for add Vertex
 void Editor::addVertex() {
 	int row = vtable->rowCount() - 1;
 	// vertex table
@@ -168,24 +172,23 @@ void Editor::addVertex() {
 			"V" + QString::number(polygonNumber) + "_" + QString::number(row);
 	}
 
-	double x =
-		static_cast<QDoubleSpinBox *>(vtable->cellWidget(row, 1))->value();
-	double y =
-		static_cast<QDoubleSpinBox *>(vtable->cellWidget(row, 2))->value();
+    double x = static_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 1))->value();
+    double y = static_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 2))->value();
 
-	// addVertexRow(row, name, x, y);
-	addVRow(row, name, x, y);
+    // addVertexRow(row, name, x, y);
+    addVRow(row, name, x, y);
 }
 
+// Change addMode to editMode
 void Editor::editVertex(int row) {
-	for (int i = 0; i < 3; ++i) {
-		vtable->cellWidget(row, i)->setEnabled(true);
-	}
-	cancelBtn = new QPushButton(this);
-	cancelBtn->setIcon(resetIcon);
-	connect(cancelBtn, &QPushButton::released, this,
-			[this, row]() { resetVertex(row); });
-	vtable->setCellWidget(row, 4, cancelBtn);
+    for (int i = 0; i < 3; ++i) {
+        vtable->cellWidget(row, i)->setEnabled(true);
+    }
+
+    cancelBtn = new QPushButton(this);
+    cancelBtn->setIcon(resetIcon);
+    connect(cancelBtn, &QPushButton::released, this, [this, row](){resetVertex(row);});
+    vtable->setCellWidget(row, 4, cancelBtn);
 
 	QStackedLayout *layout =
 		qobject_cast<QStackedLayout *>(vtable->cellWidget(row, 3)->layout());
@@ -221,18 +224,18 @@ void Editor::resetVertex(int row) {
 }
 
 void Editor::finishEditVertex(int row) {
-	for (int i = 0; i < 3; ++i) {
-		vtable->cellWidget(row, i)->setEnabled(false);
-	}
-	vtable->removeCellWidget(row, 4);
-	delete cancelBtn;
-	cancelBtn = nullptr;
-	QStackedLayout *layout =
-		qobject_cast<QStackedLayout *>(vtable->cellWidget(row, 3)->layout());
-	layout->setCurrentIndex(0);
-	for (int i = 0; i < vtable->rowCount(); ++i) {
-		vtable->cellWidget(i, 3)->setEnabled(true);
-	}
+    for (int i = 0; i < 3; ++i) {
+        vtable->cellWidget(row, i)->setEnabled(false);
+    }
+
+    vtable->removeCellWidget(row, 4);
+    delete cancelBtn;
+    cancelBtn = nullptr;
+    QStackedLayout* layout = qobject_cast<QStackedLayout*>(vtable->cellWidget(row, 3)->layout());
+    layout->setCurrentIndex(0);
+    for (int i = 0; i < vtable->rowCount(); ++i) {
+        vtable->cellWidget(i, 3)->setEnabled(true);
+    }
 }
 
 void Editor::clearNew() {
@@ -334,18 +337,19 @@ void Editor::savePolygon() {
 }
 
 void Editor::resetEditor() {
-	while (vtable->rowCount() > 1) {
-		vtable->removeRow(0);
-	}
-	while (etable->rowCount() > 0) {
-		etable->removeRow(0);
-	}
-	buffer.clear();
-	emit Mediator::instance() -> onBufferConnect(&buffer, nullptr);
-	polygonNumber = Polygon::get_polygons_total();
-	clearNew();
-	editedPolygon = nullptr;
-	dock->close();
+    while (vtable->rowCount() > 1) {
+        vtable->removeRow(0);
+    }
+    while (etable->rowCount() > 0) {
+        etable->removeRow(0);
+    }
+
+    buffer.clear();
+    emit Mediator::instance()->onBufferConnect(&buffer, nullptr);
+    polygonNumber = Polygon::get_polygons_total();
+    clearNew();
+    editedPolygon = nullptr;
+    dock->close();
 }
 
 void Editor::onPolygonSelectReceived(Polygon *polygon) {
