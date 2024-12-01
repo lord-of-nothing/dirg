@@ -46,7 +46,14 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->treeDock->setAutoFillBackground(true);
 	ui->treeDock->setPalette(pal);
 
-	setStyleSheet("QMainWindow::separator{ width: 0px; height: 0px; }");
+    setStyleSheet("QMainWindow::separator{ width: 0px; height: 0px; }");
+    // setDockOptions(QMainWindow::GroupedDockWidgets);
+
+    // Exit by Ctrl+Q
+	auto actionClose = new QAction();
+    actionClose->setShortcut(QKeySequence::Quit);
+    addAction(actionClose);
+	QObject::connect(actionClose, &QAction::triggered, this, &QCoreApplication::quit);
 }
 
 void MainWindow::newPolygon() {
