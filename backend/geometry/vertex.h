@@ -3,10 +3,10 @@
 
 #include <algorithm>
 
-#include <QUuid>
-#include <QString>
-#include <QVector>
 #include <QHash>
+#include <QString>
+#include <QUuid>
+#include <QVector>
 
 class Vertex {
 public:
@@ -22,12 +22,17 @@ public:
 
 	inline void add_edge(const QUuid &edge_id) { edges.append(edge_id); }
 	inline void remove_edge(const QUuid &edge_id) {
-		edges.erase(std::remove(edges.begin(), edges.end(), edge_id), edges.end());
+		edges.erase(std::remove(edges.begin(), edges.end(), edge_id),
+					edges.end());
 	}
-	
-	inline void add_polygon(const QUuid &polygon_id) { polygons.append(polygon_id); } 
+
+	inline void add_polygon(const QUuid &polygon_id) {
+		polygons.append(polygon_id);
+	}
 	inline void remove_polygon(const QUuid &polygon_id) {
-		polygons.erase(std::remove(polygons.begin(), polygons.end(), polygon_id), polygons.end());
+		polygons.erase(
+			std::remove(polygons.begin(), polygons.end(), polygon_id),
+			polygons.end());
 	}
 
 #if DELETE_VERTEX

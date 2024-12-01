@@ -272,54 +272,61 @@ void Editor::onBufferConnect() {
 }
 
 void Editor::savePolygon() {
-    if (etable->rowCount() < 3) {
-        return;
-    }
-    QString name = "P" + QString::number(polygonNumber);
-    QUuid id;
-    if (editedPolygon != nullptr) {
-        name = editedPolygon->name();
-        id = editedPolygon->id();
-        editedPolygon->delete_polygon();
-        editedPolygon = nullptr;
-    }
+	if (etable->rowCount() < 3) {
+		return;
+	}
+	QString name = "P" + QString::number(polygonNumber);
+	QUuid id;
+	if (editedPolygon != nullptr) {
+		name = editedPolygon->name();
+		id = editedPolygon->id();
+		editedPolygon->delete_polygon();
+		editedPolygon = nullptr;
+	}
 
-    QVector<QUuid> vertices;
-    QVector<QUuid> edges;
+	QVector<QUuid> vertices;
+	QVector<QUuid> edges;
 
-    // создаём точки
-    for (int row = 0; row < etable->rowCount(); ++row) {
-        QString vname = qobject_cast<QLineEdit*>(vtable->cellWidget(row, 0))->text();
-        double x = qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 1))->value();
-        double y = qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 2))->value();
-        Vertex v(x, y, vname);
-        vertices.append(v.id());
-    }
+	// создаём точки
+	for (int row = 0; row < etable->rowCount(); ++row) {
+		QString vname =
+			qobject_cast<QLineEdit *>(vtable->cellWidget(row, 0))->text();
+		double x =
+			qobject_cast<QDoubleSpinBox *>(vtable->cellWidget(row, 1))->value();
+		double y =
+			qobject_cast<QDoubleSpinBox *>(vtable->cellWidget(row, 2))->value();
+		Vertex v(x, y, vname);
+		vertices.append(v.id());
+	}
 
-    // создаём рёбра
-    for (int row = 0; row < etable->rowCount(); ++row) {
-        QString ename = qobject_cast<QLineEdit*>(etable->cellWidget(row, 0))->text();
-        if (ename == "") {
-            ename = "E" + QString::number(polygonNumber) + "_" + QString::number(row);
-        }
-        int property = qobject_cast<QComboBox*>(etable->cellWidget(row, 1))->currentText().toInt();
-        Edge e(vertices[row], vertices[(row + 1) % etable->rowCount()],
-               ename, property);
-        edges.append(e.id());
-    }
+	// создаём рёбра
+	for (int row = 0; row < etable->rowCount(); ++row) {
+		QString ename =
+			qobject_cast<QLineEdit *>(etable->cellWidget(row, 0))->text();
+		if (ename == "") {
+			ename = "E" + QString::number(polygonNumber) + "_" +
+					QString::number(row);
+		}
+		int property = qobject_cast<QComboBox *>(etable->cellWidget(row, 1))
+						   ->currentText()
+						   .toInt();
+		Edge e(vertices[row], vertices[(row + 1) % etable->rowCount()], ename,
+			   property);
+		edges.append(e.id());
+	}
 
-    // где-то здесь должна быть проверка корректности
+	// где-то здесь должна быть проверка корректности
 
-    // создаём полигон
-    Polygon* p = new Polygon(vertices, edges, name, 1, polygonNumber, id);
+	// создаём полигон
+	Polygon *p = new Polygon(vertices, edges, name, 1, polygonNumber, id);
 
-    // emit Mediator::instance()->polygonAdd(&p);
-    // if (!id.isNull()) {
-    //     mainWindow->removePolygon(id);
-    // }
-    // mainWindow->addPolygon(p);
-    emit Mediator::instance()->onPolygonSave(p, id.isNull());
-    resetEditor();
+	// emit Mediator::instance()->polygonAdd(&p);
+	// if (!id.isNull()) {
+	//     mainWindow->removePolygon(id);
+	// }
+	// mainWindow->addPolygon(p);
+	emit Mediator::instance() -> onPolygonSave(p, id.isNull());
+	resetEditor();
 }
 
 void Editor::resetEditor() {
@@ -348,29 +355,31 @@ void Editor::onPolygonSelectReceived(Polygon *polygon) {
 	setupExistingPolygon(polygon);
 }
 
-void Editor::setupExistingPolygon(Polygon* polygon) {
-    editedPolygon = polygon;
-    polygonNumber = editedPolygon->number();
-    // emit Mediator::instance()->onBufferConnect(&buffer, polygon);
-    for (auto& vId : polygon->vertices) {
-        Vertex& v = all_vertices[vId];
-        QString vName = v.name();
-        double x = v.x();
-        double y = v.y();
-        // addVertexRow(vtable->rowCount() - 1, vName, x, y);
-        addVRow(vtable->rowCount() - 1, vName, x, y);
-    }
+void Editor::setupExistingPolygon(Polygon *polygon) {
+	editedPolygon = polygon;
+	polygonNumber = editedPolygon->number();
+	// emit Mediator::instance()->onBufferConnect(&buffer, polygon);
+	for (auto &vId : polygon->vertices) {
+		Vertex &v = all_vertices[vId];
+		QString vName = v.name();
+		double x = v.x();
+		double y = v.y();
+		// addVertexRow(vtable->rowCount() - 1, vName, x, y);
+		addVRow(vtable->rowCount() - 1, vName, x, y);
+	}
 
-    for (auto& eId : polygon->edges) {
-        Edge& e = all_edges[eId];
-        QString eName = e.name();
-        QString material = QString::number(e.get_property());
+	for (auto &eId : polygon->edges) {
+		Edge &e = all_edges[eId];
+		QString eName = e.name();
+		QString material = QString::number(e.get_property());
 
-        qobject_cast<QLineEdit*>(etable->cellWidget(etable->rowCount() - 1, 0))->setText(eName);
-        qobject_cast<QComboBox*>(etable->cellWidget(etable->rowCount() - 1, 1))->setCurrentText(material);
-        dock->show();
-        emit Mediator::instance()->onBufferConnect(&buffer, polygon);
-    }
+		qobject_cast<QLineEdit *>(etable->cellWidget(etable->rowCount() - 1, 0))
+			->setText(eName);
+		qobject_cast<QComboBox *>(etable->cellWidget(etable->rowCount() - 1, 1))
+			->setCurrentText(material);
+		dock->show();
+		emit Mediator::instance() -> onBufferConnect(&buffer, polygon);
+	}
 }
 
 Editor::~Editor() { delete ui; }

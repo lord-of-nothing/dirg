@@ -8,9 +8,9 @@
 #include <QVector>
 #include <map>
 
-#include "vertex.h"
 #include "edge.h"
 #include "polygon.h"
+#include "vertex.h"
 
 bool check_new_point(double first_x, double first_y, double second_x,
 					 double second_y, double third_x, double third_y);

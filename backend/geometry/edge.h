@@ -3,20 +3,21 @@
 
 #include <algorithm>
 
-#include <QUuid>
-#include <QString>
-#include <QVector>
-#include <QPair>
 #include <QHash>
+#include <QPair>
+#include <QString>
+#include <QUuid>
+#include <QVector>
 
 inline QUuid shite;
 
 class Edge {
 public:
 	Edge() = default;
-	Edge(const QUuid &start, const QUuid &finish, const QString &name, int property);
+	Edge(const QUuid &start, const QUuid &finish, const QString &name,
+		 int property);
 
-	static QUuid gen_uuid() ;
+	static QUuid gen_uuid();
 
 	inline auto id() const { return id_; }
 	inline auto &name() const { return name_; }
@@ -27,10 +28,13 @@ public:
 		polygons.append(polygon_id);
 	}
 	inline void remove_polygon(const QUuid &polygon_id) {
-		polygons.erase(std::remove(polygons.begin(), polygons.end(), polygon_id), polygons.end());
+		polygons.erase(
+			std::remove(polygons.begin(), polygons.end(), polygon_id),
+			polygons.end());
 	}
 
 	QVector<QUuid> polygons;
+
 private:
 	int property_;
 	QUuid id_;
