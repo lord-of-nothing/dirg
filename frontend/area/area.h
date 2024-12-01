@@ -19,11 +19,11 @@ signals:
     void polygonSelect(Polygon* polygon);
     void polygonAdd(Polygon* polygon);
 #endif
-	void onBufferConnect(QVector<QVector2D> *data, Polygon *editedP);
-	void onPolygonSelect(Polygon *polygon);
-	void onEditorReset();
-	void onPolygonSave(Polygon *polygon, bool isNew);
-
+    void onBufferConnect(QVector<QVector2D>* data, Polygon* editedP);
+    void onPolygonSelect(Polygon* polygon);
+    void onEditorReset();
+    void onPolygonSave(Polygon* polygon, bool isNew);
+    void addNewVertex(QPoint* point);
 private:
 	Mediator() {}
 };

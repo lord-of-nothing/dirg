@@ -80,8 +80,11 @@ Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 	connect(Mediator::instance(), &Mediator::onEditorReset, this,
 			&Editor::resetEditor);
 
-	// testing
-	connect(ui->loadBtn, &QPushButton::released, this, &Editor::load);
+    // testing
+    connect(ui->loadBtn, &QPushButton::released, this, &Editor::load);
+
+    // Add Vertext by mouse click
+    connect(Mediator::instance(), &Mediator::addNewVertex, this, &Editor::addVertexByMouse);
 }
 
 // Slot for create two testing polygons
@@ -390,4 +393,22 @@ void Editor::setupExistingPolygon(Polygon *polygon) {
 	}
 }
 
-Editor::~Editor() { delete ui; }
+// Add Vertext by mouse click
+void Editor::addVertexByMouse(QPoint* point) {
+    int row = vtable->rowCount() - 1;
+    QString name = "V" + QString::number(polygonNumber) + "_" + QString::number(row);
+    
+    // For check open dock or not
+    if(dock->isVisible()) {  
+        addVRow(row, name, point->x(), point->y());
+        onBufferConnect();
+    } else {
+        resetEditor();
+        dock->show();
+        addVRow(row, name, point->x(), point->y());
+    }
+} 
+
+Editor::~Editor() {
+    delete ui;
+}

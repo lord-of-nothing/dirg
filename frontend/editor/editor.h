@@ -35,6 +35,8 @@ private slots:
     void addVertex();
     void load(); // testing
 
+    void addVertexByMouse(QPoint* point); // add new point
+
 private:
     void updateTableSize();
     // void addVertexRow(int row, QString vName, double x, double y);

@@ -83,16 +83,15 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 	painter.end();
 }
 
-void Area::mousePressEvent(QMouseEvent *event) {
-	auto pos = mapFromGlobal(event->globalPosition().toPoint());
-	auto candidates = find_polygons_by_point(pos.x(), pos.y());
-	if (candidates.size() == 0) {
-		return;
-	}
-	// emit
-	// Mediator::instance()->polygonSelect(&all_polygons[candidates.back()]);
-	emit Mediator::instance() -> onPolygonSelect(
-								  &all_polygons[candidates.back()]);
+void Area::mousePressEvent(QMouseEvent* event) {
+    auto pos = mapFromGlobal(event->globalPosition().toPoint());
+    auto candidates = find_polygons_by_point(pos.x(), pos.y());
+    if (candidates.size() == 0) {
+        emit Mediator::instance()->addNewVertex(&pos);  // If we have not selected any polygon, we create a new point.
+        return;
+    }
+    // emit Mediator::instance()->polygonSelect(&all_polygons[candidates.back()]);
+    emit Mediator::instance()->onPolygonSelect(&all_polygons[candidates.back()]);
 }
 
 void Area::onBufferConnectReceived(QVector<QVector2D> *data, Polygon *editedP) {
