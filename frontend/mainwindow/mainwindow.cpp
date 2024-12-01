@@ -5,34 +5,35 @@
 #include <QPalette>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
-    
-    ui->editorDock->setWidget(new Editor(ui->editorDock)); // ??
-    connect(ui->editorDock, &QDockWidget::visibilityChanged, this, [this]() {
-        if (!ui->editorDock->isVisible()) {
-            emit Mediator::instance()->onEditorReset();
-        }
-    });
-    ui->editorDock->close();
+	: QMainWindow(parent), ui(new Ui::MainWindow) {
+	ui->setupUi(this);
 
-    ui->tree->setHeaderHidden(true);
-    connect(ui->newPolygonBtn, &QPushButton::released, this, &MainWindow::newPolygon);
-    // connect(ui->tree, &QTreeWidget::itemClicked, this, onIte);
-    connect(ui->tree, &QTreeWidget::itemDoubleClicked, [this](QTreeWidgetItem *item, int column) {
-        QUuid id = item->data(0, Qt::UserRole).value<QUuid>();
-        selectPolygon(id);
-    });
-    connect(Mediator::instance(), &Mediator::onPolygonSave, this, [this] (Polygon* polygon, bool isNew) {
-        if (!isNew) {
-            removePolygon(polygon->id());
-        }
-        addPolygon(polygon);
-    });
-    ui->tree->setSortingEnabled(true);
-    ui->tree->sortByColumn(0, Qt::AscendingOrder);
+	ui->editorDock->setWidget(new Editor(ui->editorDock)); // ??
+	connect(ui->editorDock, &QDockWidget::visibilityChanged, this, [this]() {
+		if (!ui->editorDock->isVisible()) {
+			emit Mediator::instance() -> onEditorReset();
+		}
+	});
+	ui->editorDock->close();
+
+	ui->tree->setHeaderHidden(true);
+	connect(ui->newPolygonBtn, &QPushButton::released, this,
+			&MainWindow::newPolygon);
+	// connect(ui->tree, &QTreeWidget::itemClicked, this, onIte);
+	connect(ui->tree, &QTreeWidget::itemDoubleClicked,
+			[this](QTreeWidgetItem *item, [[maybe_unused]] int column) {
+				QUuid id = item->data(0, Qt::UserRole).value<QUuid>();
+				selectPolygon(id);
+			});
+	connect(Mediator::instance(), &Mediator::onPolygonSave, this,
+			[this](Polygon *polygon, bool isNew) {
+				if (!isNew) {
+					removePolygon(polygon->id());
+				}
+				addPolygon(polygon);
+			});
+	ui->tree->setSortingEnabled(true);
+	ui->tree->sortByColumn(0, Qt::AscendingOrder);
 
 	setWindowTitle("Grid Editor");
 	setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
@@ -46,14 +47,15 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->treeDock->setAutoFillBackground(true);
 	ui->treeDock->setPalette(pal);
 
-    setStyleSheet("QMainWindow::separator{ width: 0px; height: 0px; }");
-    // setDockOptions(QMainWindow::GroupedDockWidgets);
+	setStyleSheet("QMainWindow::separator{ width: 0px; height: 0px; }");
+	// setDockOptions(QMainWindow::GroupedDockWidgets);
 
-    // Exit by Ctrl+Q
+	// Exit by Ctrl+Q
 	auto actionClose = new QAction();
-    actionClose->setShortcut(QKeySequence::Quit);
-    addAction(actionClose);
-	QObject::connect(actionClose, &QAction::triggered, this, &QCoreApplication::quit);
+	actionClose->setShortcut(QKeySequence::Quit);
+	addAction(actionClose);
+	QObject::connect(actionClose, &QAction::triggered, this,
+					 &QCoreApplication::quit);
 }
 
 void MainWindow::newPolygon() {

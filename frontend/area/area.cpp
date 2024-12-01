@@ -6,14 +6,13 @@
 #include <QPointF>
 #include <QVector2D>
 
-Area::Area(QWidget *parent)
-    : QWidget{parent}
-{
-    // connect(Mediator::instance(), &Mediator::bufferConnect, this, &Area::onBufferConnectReceived);
-    // qWarning() << "constr";
-    connect(Mediator::instance(), &Mediator::onBufferConnect, this, &Area::onBufferConnectReceived);
+Area::Area(QWidget *parent) : QWidget{parent} {
+	// connect(Mediator::instance(), &Mediator::bufferConnect, this,
+	// &Area::onBufferConnectReceived); qWarning() << "constr";
+	connect(Mediator::instance(), &Mediator::onBufferConnect, this,
+			&Area::onBufferConnectReceived);
 
-    setMouseTracking(true);  // For check mouse position
+	setMouseTracking(true); // For check mouse position
 }
 
 void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
@@ -86,50 +85,59 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 	painter.end();
 }
 
-void Area::mousePressEvent(QMouseEvent* event) {
-    if (event->button() == Qt::LeftButton) {
-        auto pos = mapFromGlobal(event->globalPosition().toPoint());
-        auto candidates = find_polygons_by_point(pos.x(), pos.y());
-        if (candidates.size() == 0) {
-            emit Mediator::instance()->addNewVertex(&pos);  // If we have not selected any polygon, we create a new point.
-            return;
-        }
+void Area::mousePressEvent(QMouseEvent *event) {
+	if (event->button() == Qt::LeftButton) {
+		auto pos = mapFromGlobal(event->globalPosition().toPoint());
+		auto candidates = find_polygons_by_point(pos.x(), pos.y());
+		if (candidates.size() == 0) {
+			emit Mediator::instance()
+				-> addNewVertex(&pos); // If we have not selected any polygon,
+									   // we create a new point.
+			return;
+		}
 
-        auto &last_candidate = all_polygons[candidates.last()];
-        auto vertices = last_candidate.vertices;
+		auto &last_candidate = all_polygons[candidates.last()];
+		auto vertices = last_candidate.vertices;
 
-        // emit Mediator::instance()->polygonSelect(&all_polygons[candidates.back()]);
-        emit Mediator::instance()->onPolygonSelect(&last_candidate); //FIXME: Если заменить на last_coniddate, то ломается
+		// emit
+		// Mediator::instance()->polygonSelect(&all_polygons[candidates.back()]);
+		emit Mediator::instance()
+			-> onPolygonSelect(&last_candidate); // FIXME: Если заменить на
+												 // last_coniddate, то ломается
 
-        // Verification of click on the vertex
-        for (int i = 0; i < vertices.size(); ++i) {
-            QPoint cur_point_vertex{int(all_vertices[vertices.at(i)].x()), int(all_vertices[vertices.at(i)].y())};
-            if(QRect(cur_point_vertex - QPoint(3, 3), QSize(10, 10)).contains(event->pos())) {
-                qDebug() << "Click on point with coord: " << cur_point_vertex;
-                draggingVertex = i;
-                dragOffset = event->pos() - cur_point_vertex;
-                emit Mediator::instance()->editVertexMouse(draggingVertex);
-                break;
-            }
-        }
-    }
+		// Verification of click on the vertex
+		for (int i = 0; i < vertices.size(); ++i) {
+			QPoint cur_point_vertex{int(all_vertices[vertices.at(i)].x()),
+									int(all_vertices[vertices.at(i)].y())};
+			if (QRect(cur_point_vertex - QPoint(3, 3), QSize(10, 10))
+					.contains(event->pos())) {
+				qDebug() << "Click on point with coord: " << cur_point_vertex;
+				draggingVertex = i;
+				dragOffset = event->pos() - cur_point_vertex;
+				emit Mediator::instance() -> editVertexMouse(draggingVertex);
+				break;
+			}
+		}
+	}
 }
 
-// В теории тут будем ещё отслеживать мышку, для изменения курсора при наведении на точку
+// В теории тут будем ещё отслеживать мышку, для изменения курсора при наведении
+// на точку
 void Area::mouseMoveEvent(QMouseEvent *event) {
-    if(draggingVertex != -1) {
-        auto new_coord = event->pos() - dragOffset;
-        emit Mediator::instance()->editVertexCoordMouse(draggingVertex, &new_coord);
-    }
+	if (draggingVertex != -1) {
+		auto new_coord = event->pos() - dragOffset;
+		emit Mediator::instance() -> editVertexCoordMouse(draggingVertex,
+														  &new_coord);
+	}
 }
 
 void Area::mouseReleaseEvent(QMouseEvent *event) {
-    if (event->button() == Qt::LeftButton) {
-        if(draggingVertex != -1) {
-            emit Mediator::instance()->saveVertexMouse(draggingVertex);
-        }
-        draggingVertex = -1;
-    }
+	if (event->button() == Qt::LeftButton) {
+		if (draggingVertex != -1) {
+			emit Mediator::instance() -> saveVertexMouse(draggingVertex);
+		}
+		draggingVertex = -1;
+	}
 }
 
 void Area::onBufferConnectReceived(QVector<QVector2D> *data, Polygon *editedP) {
