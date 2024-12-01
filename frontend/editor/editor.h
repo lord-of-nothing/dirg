@@ -36,6 +36,7 @@ private slots:
     void load(); // testing
 
     void addVertexByMouse(QPoint* point); // add new point
+    void editVertexCoord(int row, QPoint* new_coord); // change coord for vertex when move by mouse 
 
 private:
     void updateTableSize();

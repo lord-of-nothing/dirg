@@ -85,6 +85,12 @@ Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 
     // Add Vertext by mouse click
     connect(Mediator::instance(), &Mediator::addNewVertex, this, &Editor::addVertexByMouse);
+
+    // Dragging Vertex 
+    connect(Mediator::instance(), &Mediator::editVertexMouse, this, &Editor::editVertex);
+    connect(Mediator::instance(), &Mediator::editVertexCoordMouse, this, &Editor::editVertexCoord);
+    connect(Mediator::instance(), &Mediator::saveVertexMouse, this, &Editor::saveVertex);
+    connect(Mediator::instance(), &Mediator::saveVertexMouse, this, &Editor::onBufferConnect);
 }
 
 // Slot for create two testing polygons
@@ -408,6 +414,16 @@ void Editor::addVertexByMouse(QPoint* point) {
         addVRow(row, name, point->x(), point->y());
     }
 } 
+
+// Change coord for vertex when move by mouse 
+void Editor::editVertexCoord(int row, QPoint* new_coord) {
+    qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 1))->setValue(new_coord->x());
+    qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 2))->setValue(new_coord->y());
+
+    buffer[row] = QVector2D(new_coord->x(), new_coord->y());
+    onBufferConnect();
+}
+
 
 Editor::~Editor() {
     delete ui;
