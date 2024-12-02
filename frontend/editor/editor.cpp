@@ -85,18 +85,18 @@ Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 	connect(ui->loadBtn, &QPushButton::released, this, &Editor::load);
 
 	// Add Vertext by mouse click
-	connect(Mediator::instance(), &Mediator::addNewVertex, this,
-			&Editor::addVertexByMouse);
+	// connect(Mediator::instance(), &Mediator::addNewVertex, this,
+	// 		&Editor::addVertexByMouse);
 
-	// Dragging Vertex
-	connect(Mediator::instance(), &Mediator::editVertexMouse, this,
-			&Editor::editVertex);
-	connect(Mediator::instance(), &Mediator::editVertexCoordMouse, this,
-			&Editor::editVertexCoord);
-	connect(Mediator::instance(), &Mediator::saveVertexMouse, this,
-			&Editor::saveVertex);
-	connect(Mediator::instance(), &Mediator::saveVertexMouse, this,
-			&Editor::onBufferConnect);
+	// // Dragging Vertex
+	// connect(Mediator::instance(), &Mediator::editVertexMouse, this,
+	// 		&Editor::editVertex);
+	// connect(Mediator::instance(), &Mediator::editVertexCoordMouse, this,
+	// 		&Editor::editVertexCoord);
+	// connect(Mediator::instance(), &Mediator::saveVertexMouse, this,
+	// 		&Editor::saveVertex);
+	// connect(Mediator::instance(), &Mediator::saveVertexMouse, this,
+	// 		&Editor::onBufferConnect);
 }
 
 // Slot for create two testing polygons
@@ -400,46 +400,51 @@ void Editor::setupExistingPolygon(Polygon *polygon) {
 		addVRow(vtable->rowCount() - 1, vName, x, y);
 	}
 
-	for (auto &eId : polygon->edges) {
+	// for (auto &eId : polygon->edges) {
+	for (int i = 0; i < polygon->edges.size(); ++i) {
+		auto eId = polygon->edges[i];
 		Edge &e = all_edges[eId];
 		QString eName = e.name();
 		QString material = QString::number(e.get_property());
+		// auto material = e.get_property();
 
-		qobject_cast<QLineEdit *>(etable->cellWidget(etable->rowCount() - 1, 0))
+		qobject_cast<QLineEdit *>(etable->cellWidget(i, 0))
 			->setText(eName);
-		qobject_cast<QComboBox *>(etable->cellWidget(etable->rowCount() - 1, 1))
-			->setCurrentText(material);
+		QComboBox* cbox = qobject_cast<QComboBox *>(etable->cellWidget(i, 1));
+		int tmp = cbox->findText(material);
+		cbox->setCurrentIndex(tmp);
+		tmp = cbox->currentIndex();
 		dock->show();
 		emit Mediator::instance() -> onBufferConnect(&buffer, polygon);
 	}
 }
 
 // Add Vertext by mouse click
-void Editor::addVertexByMouse(QPoint *point) {
-	int row = vtable->rowCount() - 1;
-	QString name =
-		"V" + QString::number(polygonNumber) + "_" + QString::number(row);
+// void Editor::addVertexByMouse(QPoint *point) {
+// 	int row = vtable->rowCount() - 1;
+// 	QString name =
+// 		"V" + QString::number(polygonNumber) + "_" + QString::number(row);
 
-	// For check open dock or not
-	if (dock->isVisible()) {
-		addVRow(row, name, point->x(), point->y());
-		onBufferConnect();
-	} else {
-		resetEditor();
-		dock->show();
-		addVRow(row, name, point->x(), point->y());
-	}
-}
+// 	// For check open dock or not
+// 	if (dock->isVisible()) {
+// 		addVRow(row, name, point->x(), point->y());
+// 		onBufferConnect();
+// 	} else {
+// 		resetEditor();
+// 		dock->show();
+// 		addVRow(row, name, point->x(), point->y());
+// 	}
+// }
 
-// Change coord for vertex when move by mouse
-void Editor::editVertexCoord(int row, QPoint *new_coord) {
-	qobject_cast<QDoubleSpinBox *>(vtable->cellWidget(row, 1))
-		->setValue(new_coord->x());
-	qobject_cast<QDoubleSpinBox *>(vtable->cellWidget(row, 2))
-		->setValue(new_coord->y());
+// // Change coord for vertex when move by mouse
+// void Editor::editVertexCoord(int row, QPoint *new_coord) {
+// 	qobject_cast<QDoubleSpinBox *>(vtable->cellWidget(row, 1))
+// 		->setValue(new_coord->x());
+// 	qobject_cast<QDoubleSpinBox *>(vtable->cellWidget(row, 2))
+// 		->setValue(new_coord->y());
 
-	buffer[row] = QVector2D(new_coord->x(), new_coord->y());
-	onBufferConnect();
-}
+// 	buffer[row] = QVector2D(new_coord->x(), new_coord->y());
+// 	onBufferConnect();
+// }
 
 Editor::~Editor() { delete ui; }

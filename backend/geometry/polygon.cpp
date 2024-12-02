@@ -24,6 +24,8 @@ Polygon::Polygon(const QVector<QUuid> &vertices, const QVector<QUuid> &edges,
 	for (auto &vertice : vertices) {
 		all_vertices[vertice].add_polygon(id_);
 	}
+
+	total_polygon_number++;
 }
 
 auto &Polygon::next_vertex(const QUuid &current_vertex) const {

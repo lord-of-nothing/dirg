@@ -89,7 +89,7 @@ void MainWindow::removePolygon(QUuid id) {
 	// Проходим по всем дочерним элементам первого уровня
 	for (int i = 0; i < count; ++i) {
 		QTreeWidgetItem *item =
-			ui->tree->takeTopLevelItem(0); // Убираем первый элемент
+			ui->tree->topLevelItem(i); // Убираем первый элемент
 		if (item->data(0, Qt::UserRole) == target) {
 			delete item; // Удаляем поддерево
 			return;		 // После удаления выходим

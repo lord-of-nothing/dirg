@@ -51,7 +51,7 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 			continue;
 		}
 		QVector<QUuid> &vertices = polygon.vertices;
-		qDebug() << vertices.size();
+		// qDebug() << vertices.size();
 		for (int i = 0; i < vertices.size(); ++i) {
 			Vertex &curV = all_vertices[vertices[i]];
 			Vertex &nextV = all_vertices[vertices[(i + 1) % vertices.size()]];
@@ -90,8 +90,8 @@ void Area::mousePressEvent(QMouseEvent *event) {
 		auto pos = mapFromGlobal(event->globalPosition().toPoint());
 		auto candidates = find_polygons_by_point(pos.x(), pos.y());
 		if (candidates.size() == 0) {
-			emit Mediator::instance()
-				-> addNewVertex(&pos); // If we have not selected any polygon,
+			// emit Mediator::instance()
+				// -> addNewVertex(&pos); // If we have not selected any polygon,
 									   // we create a new point.
 			return;
 		}
@@ -99,12 +99,12 @@ void Area::mousePressEvent(QMouseEvent *event) {
 		auto &last_candidate = all_polygons[candidates.last()];
 		auto vertices = last_candidate.vertices;
 
-		// emit
-		// Mediator::instance()->polygonSelect(&all_polygons[candidates.back()]);
+		// emit Mediator::instance()->onPolygonSelect(&all_polygons[candidates.back()]);
 		emit Mediator::instance()
 			-> onPolygonSelect(&last_candidate); // FIXME: Если заменить на
 												 // last_coniddate, то ломается
 
+		#if 0
 		// Verification of click on the vertex
 		for (int i = 0; i < vertices.size(); ++i) {
 			QPoint cur_point_vertex{int(all_vertices[vertices.at(i)].x()),
@@ -118,9 +118,10 @@ void Area::mousePressEvent(QMouseEvent *event) {
 				break;
 			}
 		}
+		#endif
 	}
 }
-
+#if 0
 // В теории тут будем ещё отслеживать мышку, для изменения курсора при наведении
 // на точку
 void Area::mouseMoveEvent(QMouseEvent *event) {
@@ -139,6 +140,7 @@ void Area::mouseReleaseEvent(QMouseEvent *event) {
 		draggingVertex = -1;
 	}
 }
+#endif
 
 void Area::onBufferConnectReceived(QVector<QVector2D> *data, Polygon *editedP) {
 	if (bufferData == nullptr) {
