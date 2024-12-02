@@ -2,7 +2,7 @@
 #include "ui_editor.h"
 
 #include "area.h"
-#include "geometry.h"
+// #include "geometry.h"
 
 #include <QComboBox>
 #include <QDoubleSpinBox>
@@ -31,6 +31,7 @@ Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 											  "    border: none;"
 											  "}");
 	vtable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	vtable->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
 	// edgeTable setUp
 	etable->setColumnCount(2);
@@ -41,6 +42,7 @@ Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 											  "    border: none;"
 											  "}");
 	etable->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	etable->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
 	connect(ui->confirmBtn, &QPushButton::released, this, &Editor::savePolygon);
 	connect(ui->cancelBtn, &QPushButton::released, this, &Editor::resetEditor);
@@ -80,6 +82,10 @@ Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 			&Editor::onPolygonSelectReceived);
 	connect(Mediator::instance(), &Mediator::onEditorReset, this,
 			&Editor::resetEditor);
+	connect(Mediator::instance(), &Mediator::onVertexSelect, this,
+			&Editor::onVertexSelectReceived);
+	connect(Mediator::instance(), &Mediator::onEdgeSelect, this,
+			&Editor::onEdgeSelectReceived);
 
 	// testing
 	connect(ui->loadBtn, &QPushButton::released, this, &Editor::load);
@@ -279,13 +285,13 @@ void Editor::updateTableSize() {
 		vtable->setColumnWidth(col, tableWidth * 0.3);
 	}
 	for (auto col = 3; col < 6; ++col) {
-		vtable->setColumnWidth(col, tableWidth * 0.05);
+		vtable->setColumnWidth(col, tableWidth * 0.04);
 	}
 
 	// edge table
 	tableWidth = etable->width();
-	etable->setColumnWidth(0, tableWidth * 0.5);
-	etable->setColumnWidth(1, tableWidth * 0.5);
+	etable->setColumnWidth(0, tableWidth * 0.48);
+	etable->setColumnWidth(1, tableWidth * 0.48);
 }
 
 void Editor::showEvent([[maybe_unused]] QShowEvent *event) {
@@ -378,11 +384,11 @@ void Editor::resetEditor() {
 
 void Editor::onPolygonSelectReceived(Polygon *polygon) {
 	// dock->show();
-	if (polygon == editedPolygon) {
-		dock->show();
-		emit Mediator::instance() -> onBufferConnect(&buffer, polygon);
-		return;
-	}
+	// if (polygon == editedPolygon) {
+		// dock->show();
+		// emit Mediator::instance() -> onBufferConnect(&buffer, polygon);
+		// return;
+	// }
 	resetEditor();
 	setupExistingPolygon(polygon);
 }
@@ -411,11 +417,32 @@ void Editor::setupExistingPolygon(Polygon *polygon) {
 		qobject_cast<QLineEdit *>(etable->cellWidget(i, 0))
 			->setText(eName);
 		QComboBox* cbox = qobject_cast<QComboBox *>(etable->cellWidget(i, 1));
-		int tmp = cbox->findText(material);
-		cbox->setCurrentIndex(tmp);
-		tmp = cbox->currentIndex();
+		int idx = cbox->findText(material);
+		cbox->setCurrentIndex(idx);
 		dock->show();
 		emit Mediator::instance() -> onBufferConnect(&buffer, polygon);
+	}
+}
+
+void Editor::onVertexSelectReceived(Vertex* vertex) {
+	auto vName = vertex->name();
+	for (int row = 0; row < vtable->rowCount() - 1; ++row) {
+		QLineEdit* nameEdit = qobject_cast<QLineEdit*>(vtable->cellWidget(row, 0));
+		if (nameEdit->text() == vName) {
+			editVertex(row);
+			return;
+		}
+	}
+}
+
+void Editor::onEdgeSelectReceived(Edge* edge) {
+	auto eName = edge->name();
+	for (int row = 0; row < etable->rowCount(); ++row) {
+		QLineEdit* nameEdit = qobject_cast<QLineEdit*>(etable->cellWidget(row, 0));
+		if (nameEdit->text() == eName) {
+			etable->selectRow(row);
+			return;
+		}
 	}
 }
 

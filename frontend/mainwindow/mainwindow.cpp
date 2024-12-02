@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent), ui(new Ui::MainWindow) {
 	ui->setupUi(this);
 
-	ui->editorDock->setWidget(new Editor(ui->editorDock)); // ??
+	ui->editorDock->setWidget(new Editor(ui->editorDock)); // ?? -- а что не так?
 	connect(ui->editorDock, &QDockWidget::visibilityChanged, this, [this]() {
 		if (!ui->editorDock->isVisible()) {
 			emit Mediator::instance() -> onEditorReset();
@@ -22,8 +22,20 @@ MainWindow::MainWindow(QWidget *parent)
 	// connect(ui->tree, &QTreeWidget::itemClicked, this, onIte);
 	connect(ui->tree, &QTreeWidget::itemDoubleClicked,
 			[this](QTreeWidgetItem *item, [[maybe_unused]] int column) {
-				QUuid id = item->data(0, Qt::UserRole).value<QUuid>();
-				selectPolygon(id);
+				QUuid itemId = item->data(0, Qt::UserRole).value<QUuid>();
+				if (all_polygons.contains(itemId)) {
+					selectPolygon(itemId);
+					return;
+				}
+				QUuid polygonId = item->parent()->parent()->data(0, Qt::UserRole).value<QUuid>();
+				selectPolygon(polygonId);
+				if (all_vertices.contains(itemId)) {
+					// selectVertex(id);
+					emit Mediator::instance()->onVertexSelect(&all_vertices[itemId]);
+				} else {
+					// selectEdge(id);
+					emit Mediator::instance()->onEdgeSelect(&all_edges[itemId]);
+				}
 			});
 	connect(Mediator::instance(), &Mediator::onPolygonSave, this,
 			[this](Polygon *polygon, bool isNew) {
@@ -70,16 +82,20 @@ void MainWindow::addPolygon(Polygon *polygon) {
 
 	QTreeWidgetItem *vertexFolder = new QTreeWidgetItem(polyItem);
 	vertexFolder->setText(0, "Vertices");
+	vertexFolder->setData(0, Qt::UserRole, QVariant::fromValue(polygon->id()));
 	QTreeWidgetItem *edgeFolder = new QTreeWidgetItem(polyItem);
 	edgeFolder->setText(0, "Edges");
+	edgeFolder->setData(0, Qt::UserRole, QVariant::fromValue(polygon->id()));
 
 	for (auto &vertex : polygon->vertices) {
 		QTreeWidgetItem *v = new QTreeWidgetItem(vertexFolder);
 		v->setText(0, all_vertices[vertex].name());
+		v->setData(0, Qt::UserRole, QVariant::fromValue(vertex));
 	}
 	for (auto &edge : polygon->edges) {
 		QTreeWidgetItem *e = new QTreeWidgetItem(edgeFolder);
 		e->setText(0, all_edges[edge].name());
+		e->setData(0, Qt::UserRole, QVariant::fromValue(edge));
 	}
 }
 

@@ -23,6 +23,8 @@ signals:
 	void onPolygonSelect(Polygon *polygon);
 	void onEditorReset();
 	void onPolygonSave(Polygon *polygon, bool isNew);
+	void onEdgeSelect(Edge* edge);
+	void onVertexSelect(Vertex* vertex);
 
 	// void addNewVertex(QPoint *point);
 	// void editVertexMouse(int row);

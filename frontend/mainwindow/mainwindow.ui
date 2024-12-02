@@ -98,7 +98,6 @@
  <customwidgets>
   <customwidget>
    <class>Area</class>
-   <extends>QWidget</extends>
    <container>1</container>
   </customwidget>
  </customwidgets>

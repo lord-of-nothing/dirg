@@ -31,6 +31,8 @@ protected:
 private slots:
 	void onBufferConnect();
 	void onPolygonSelectReceived(Polygon *polygon);
+	void onVertexSelectReceived(Vertex* vertex);
+	void onEdgeSelectReceived(Edge* edge);
 
 	void addVertex();
 	void load(); // testing
