@@ -58,7 +58,9 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 
 			painter.drawEllipse(QPointF(curV.x(), curV.y()), 5.0, 5.0);
 			// Debug drawing of vertex selection radius
-			// painter.drawRect(QRect(QPoint(curV.x(), curV.y()) - QPoint(select_radius / 2, select_radius / 2), QSize(select_radius, select_radius)));
+			// painter.drawRect(QRect(QPoint(curV.x(), curV.y()) -
+			// QPoint(select_radius / 2, select_radius / 2),
+			// QSize(select_radius, select_radius)));
 			painter.drawLine(QPointF(curV.x(), curV.y()),
 							 QPointF(nextV.x(), nextV.y()));
 		}
@@ -88,29 +90,12 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 }
 
 void Area::mousePressEvent(QMouseEvent *event) {
-	if(event->button() == Qt::LeftButton) {
+	if (event->button() == Qt::LeftButton) {
 		auto pos = mapFromGlobal(event->globalPosition().toPoint());
 
 		// Verification of click on the vertex
-		for (auto iter = all_vertices.begin(); iter != all_vertices.end(); ++iter) {
-			QPoint cur_point_vertex{int(iter->x()),
-									int(iter->y())};
-			if (QRect(cur_point_vertex - QPoint(select_radius / 2, select_radius / 2), 
-								QSize(select_radius, select_radius))
-					.contains(event->pos())) {
-				qDebug() << "Click on point with coord: " << cur_point_vertex;
-				auto curPolygon = iter->polygons.last(); // FIXME: Сейчас берем последний добавленный полигон для редактирования
-				for(int i = 0; i < all_polygons[curPolygon].vertices.size(); ++i) {
-					if(all_polygons[curPolygon].vertices.at(i) == iter->id()) {
-						draggingVertex = i;
-						dragOffset = event->pos() - cur_point_vertex;
-						emit Mediator::instance() -> onPolygonSelect(&all_polygons[curPolygon]); 
-						emit Mediator::instance() -> editVertexMouse(draggingVertex);
-						break;
-					}
-				}
-				return;
-			}
+		if (grabVertex(event->pos())) {
+			return;
 		}
 
 		auto candidates = find_polygons_by_point(pos.x(), pos.y());
@@ -125,12 +110,11 @@ void Area::mousePressEvent(QMouseEvent *event) {
 		auto &last_candidate = all_polygons[candidates.last()];
 		auto vertices = last_candidate.vertices;
 
-		emit Mediator::instance()
-			-> onPolygonSelect(&last_candidate); 
+		emit Mediator::instance() -> onPolygonSelect(&last_candidate);
 
-		
 	} else if ((event->button() == Qt::RightButton)) {
-		for(auto iter = all_vertices.begin(); iter != all_vertices.end(); ++iter) {
+		for (auto iter = all_vertices.begin(); iter != all_vertices.end();
+			 ++iter) {
 			qDebug() << QPoint(iter->x(), iter->y());
 		}
 	}
@@ -139,12 +123,17 @@ void Area::mousePressEvent(QMouseEvent *event) {
 // В теории тут будем ещё отслеживать мышку, для изменения курсора при наведении
 // на точку
 void Area::mouseMoveEvent(QMouseEvent *event) {
-	if(draggingVertex != -1) {
+	if (draggingVertex != -1) {
 		auto new_coord = event->pos() - dragOffset;
 		emit Mediator::instance() -> editVertexCoordMouse(draggingVertex,
 														  &new_coord);
+	} else {
+		if (vertexNearCursor(event->pos())) {
+			setCursor(Qt::PointingHandCursor);
+		} else {
+			unsetCursor();
+		}
 	}
-	
 }
 
 void Area::mouseReleaseEvent(QMouseEvent *event) {
@@ -154,6 +143,49 @@ void Area::mouseReleaseEvent(QMouseEvent *event) {
 		}
 		draggingVertex = -1;
 	}
+}
+
+// Check mouse over vertex
+bool Area::vertexNearCursor(const QPoint &pos) {
+	for (auto iter = all_vertices.begin(); iter != all_vertices.end(); ++iter) {
+		QPoint cur_point_vertex{int(iter->x()), int(iter->y())};
+		if (QRect(cur_point_vertex -
+					  QPoint(select_radius / 2, select_radius / 2),
+				  QSize(select_radius, select_radius))
+				.contains(pos)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+// Verification of click on the vertex
+bool Area::grabVertex(const QPoint &pos) {
+	for (auto iter = all_vertices.begin(); iter != all_vertices.end(); ++iter) {
+		QPoint cur_point_vertex{int(iter->x()), int(iter->y())};
+		if (QRect(cur_point_vertex -
+					  QPoint(select_radius / 2, select_radius / 2),
+				  QSize(select_radius, select_radius))
+				.contains(pos)) {
+			qDebug() << "Click on point with coord: " << cur_point_vertex;
+			auto curPolygon =
+				iter->polygons.last(); // FIXME: Сейчас берем последний
+									   // добавленный полигон для редактирования
+			for (int i = 0; i < all_polygons[curPolygon].vertices.size(); ++i) {
+				if (all_polygons[curPolygon].vertices.at(i) == iter->id()) {
+					draggingVertex = i;
+					dragOffset = pos - cur_point_vertex;
+					emit Mediator::instance() -> onPolygonSelect(
+												  &all_polygons[curPolygon]);
+					emit Mediator::instance() -> editVertexMouse(
+												  draggingVertex);
+					break;
+				}
+			}
+			return true;
+		}
+	}
+	return false;
 }
 
 void Area::onBufferConnectReceived(QVector<QVector2D> *data, Polygon *editedP) {

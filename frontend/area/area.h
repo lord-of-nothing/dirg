@@ -51,6 +51,9 @@ private:
 	QVector<QVector2D> *bufferData = nullptr;
 	Polygon *edited;
 
+	bool grabVertex(const QPoint &pos);
+	bool vertexNearCursor(const QPoint &pos);
+
 	constexpr static inline int select_radius = 10;
 	int draggingVertex =
 		-1;			   // Index of dragged vertex (-1 if no vertex is dragged)
