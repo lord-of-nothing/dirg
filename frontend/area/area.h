@@ -51,6 +51,7 @@ private:
 	QVector<QVector2D> *bufferData = nullptr;
 	Polygon *edited;
 
+	constexpr static inline int select_radius = 10;
 	int draggingVertex =
 		-1;			   // Index of dragged vertex (-1 if no vertex is dragged)
 	QPoint dragOffset; // Cursor offset relative to the vertex at the start of
