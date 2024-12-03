@@ -52,8 +52,26 @@ Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 				  "QDoubleSpinBox { border: 1px solid gray; border-radius: "
 				  "4px; padding: 2px 4px; }");
 
+	// connect(etable, &QTableWidget::itemSelectionChanged, this,
+	// 		[this] () {
+	// 			auto selection = etable->selectedItems();
+	// 			if (selection.empty()) {
+	// 				emit Mediator::instance()->onHighlightReset();
+	// 				return;
+	// 			}
+	// 			int row = selection.first()->row();
+	// 			QPointF v1;
+	// 			v1.setX(qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 1))->value());
+	// 			v1.setY(qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 2))->value());
+	// 			int next_row = (row + 1) % etable->rowCount();
+	// 			QPointF v2;
+	// 			v2.setX(qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(next_row, 1))->value());
+	// 			v2.setY(qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(next_row, 2))->value());
+	// 			emit Mediator::instance()->onLineHighlight(QLineF(v1, v2));
+	// 		});
+
 	// vertex table empty row setup
-	vtable->insertRow(0);
+vtable->insertRow(0);
 	QLineEdit *nameEdit = new QLineEdit(this);
 	nameEdit->setPlaceholderText("V" + QString::number(polygonNumber) + "_" +
 								 QString::number(0));
@@ -182,7 +200,6 @@ void Editor::addVRow(int row, QString vName, double x, double y) {
 	QComboBox *materialCombo = new QComboBox(this);
 	materialCombo->addItems(materials);
 	etable->setCellWidget(row, 1, materialCombo);
-
 	buffer.append(QVector2D(x, y));
 }
 

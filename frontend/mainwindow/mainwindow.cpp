@@ -19,7 +19,8 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->tree->setHeaderHidden(true);
 	connect(ui->newPolygonBtn, &QPushButton::released, this,
 			&MainWindow::newPolygon);
-	// connect(ui->tree, &QTreeWidget::itemClicked, this, onIte);
+
+	// double click (open editor)
 	connect(ui->tree, &QTreeWidget::itemDoubleClicked, this,
 			[this](QTreeWidgetItem *item, [[maybe_unused]] int column) {
 				QUuid itemId = item->data(0, Qt::UserRole).value<QUuid>();
@@ -37,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent)
 					emit Mediator::instance()->onEdgeSelect(&all_edges[itemId]);
 				}
 			});
+
+	// selection change (vertex/edge highlighting)
 	connect(ui->tree, &QTreeWidget::itemSelectionChanged,
 			this, [this]() {
 				if (ui->editorDock->isVisible()) {
@@ -50,10 +53,17 @@ MainWindow::MainWindow(QWidget *parent)
 						if (all_vertices.contains(id)) {
 							Vertex& v = all_vertices[id];
 							emit Mediator::instance()->onPointHighlight(QPointF(v.x(), v.y()));
+						} else if (all_edges.contains(id)){
+							Edge& e = all_edges[id];
+							Vertex& v1 = all_vertices[e.coords().first];
+							Vertex& v2 = all_vertices[e.coords().second];
+							emit Mediator::instance()->onLineHighlight(QLineF(QPointF(v1.x(), v1.y()),
+																				QPointF(v2.x(), v2.y())));
 						}
 					}
 				}
 			});
+
 	connect(Mediator::instance(), &Mediator::onPolygonSave, this,
 			[this](Polygon *polygon, bool isNew) {
 				if (!isNew) {

@@ -26,6 +26,7 @@ signals:
 	void onEdgeSelect(Edge* edge);
 	void onVertexSelect(Vertex* vertex);
 	void onPointHighlight(QPointF point);
+	void onLineHighlight(QLineF line);
 	void onHighlightReset();
 
 	// void addNewVertex(QPoint *point);
@@ -52,6 +53,7 @@ private slots:
 	void onBufferConnectReceived(QVector<QVector2D> *data, Polygon *editedP);
 	void resetHighlight();
 	void onPointHighlightReceived(QPointF point);
+	void onLineHighlightReceived(QLineF line);
 
 private:
 	QVector<QVector2D> *bufferData = nullptr;

@@ -15,8 +15,10 @@ Area::Area(QWidget *parent) : QWidget{parent} {
 			&Area::resetHighlight);
 	connect(Mediator::instance(), &Mediator::onPointHighlight, this,
 			&Area::onPointHighlightReceived);
+	connect(Mediator::instance(), &Mediator::onLineHighlight, this,
+			&Area::onLineHighlightReceived);
 
-	setMouseTracking(true); // For check mouse position
+	// setMouseTracking(true); // For check mouse position
 }
 
 void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
@@ -85,9 +87,13 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 		}
 	}
 	painter.setBrush(Qt::blue);
-	painter.setPen(Qt::blue);
+	pen.setColor(Qt::blue);
+	pen.setWidth(4.0);
+	painter.setPen(pen);
 	if (pointH.x() != -1) {
 		painter.drawEllipse(pointH, 5.0, 5.0);
+	} else if (lineH.length()) {
+		painter.drawLine(lineH);
 	}
 
 	painter.end();
@@ -170,5 +176,11 @@ void Area::resetHighlight() {
 void Area::onPointHighlightReceived(QPointF point) {
 	resetHighlight();
 	pointH = point;
+	repaint();
+}
+
+void Area::onLineHighlightReceived(QLineF line) {
+	resetHighlight();
+	lineH = line;
 	repaint();
 }
