@@ -18,6 +18,7 @@ public:
 	inline auto id() const { return id_; }
 	inline auto &name() const { return name_; }
 	inline auto number() const { return cur_polygon_number_; }
+	inline auto material() const { return material_; }
 
 	auto &next_vertex(const QUuid &current_vertex) const;
 	auto &prev_vertex(const QUuid &current_vertex) const;

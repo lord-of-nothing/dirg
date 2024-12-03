@@ -112,6 +112,7 @@ Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 void Editor::load() {
 	// testing polygon
 	// triangle
+	resetEditor();
 	addVRow(0, "V" + QString::number(polygonNumber) + "_0", 0.0, 0.0);
 	addVRow(1, "V" + QString::number(polygonNumber) + "_1", 700.0, 500.0);
 	addVRow(2, "V" + QString::number(polygonNumber) + "_2", 900.0, 100.0);
@@ -375,10 +376,17 @@ void Editor::savePolygon() {
 		eNameCheck.insert(eNames[row]);
 	}
 
-	QString name = "P" + QString::number(polygonNumber);
+	// имя полигона
+	QString name = ui->polygonNameEdit->text();
+	if (name.isEmpty()) {
+		name = ui->polygonNameEdit->placeholderText();
+	}
+	// материал полигона
+	int material = ui->polygonMaterial->currentText().toInt();
+
 	QUuid id;
 	if (editedPolygon != nullptr) {
-		name = editedPolygon->name();
+		// name = editedPolygon->name();
 		id = editedPolygon->id();
 		editedPolygon->delete_polygon();
 		editedPolygon = nullptr;
@@ -405,7 +413,7 @@ void Editor::savePolygon() {
 
 
 	// создаём полигон
-	Polygon *p = new Polygon(vertices, edges, name, 1, polygonNumber, id);
+	Polygon *p = new Polygon(vertices, edges, name, material, polygonNumber, id);
 
 	// emit Mediator::instance()->polygonAdd(&p);
 	// if (!id.isNull()) {
@@ -428,6 +436,8 @@ void Editor::resetEditor() {
 	emit Mediator::instance() -> onBufferConnect(&buffer, nullptr);
 	emit Mediator::instance()->onHighlightReset();
 	polygonNumber = Polygon::get_polygons_total();
+	ui->polygonNameEdit->setText("");
+	ui->polygonNameEdit->setPlaceholderText("P" + QString::number(polygonNumber));
 	clearNew();
 	editedPolygon = nullptr;
 	ui->errorBar->setText("");
@@ -448,6 +458,9 @@ void Editor::onPolygonSelectReceived(Polygon *polygon) {
 void Editor::setupExistingPolygon(Polygon *polygon) {
 	editedPolygon = polygon;
 	polygonNumber = editedPolygon->number();
+	ui->polygonNameEdit->setPlaceholderText("P" + QString::number(polygonNumber));
+	ui->polygonNameEdit->setText(polygon->name());
+	ui->polygonMaterial->setCurrentText(QString::number(polygon->material()));
 	// emit Mediator::instance()->onBufferConnect(&buffer, polygon);
 	for (auto &vId : polygon->vertices) {
 		Vertex &v = all_vertices[vId];
