@@ -228,6 +228,10 @@ void Editor::editVertex(int row) {
 			vtable->cellWidget(i, 3)->setEnabled(false);
 		}
 	}
+
+	double x = qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 1))->value();
+	double y = qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 2))->value();
+	emit Mediator::instance()->onPointHighlight(QPointF(x, y));
 }
 
 void Editor::saveVertex(int row) {
@@ -266,6 +270,7 @@ void Editor::finishEditVertex(int row) {
 	for (int i = 0; i < vtable->rowCount(); ++i) {
 		vtable->cellWidget(i, 3)->setEnabled(true);
 	}
+	emit Mediator::instance()->onHighlightReset();
 }
 
 void Editor::clearNew() {
@@ -376,6 +381,7 @@ void Editor::resetEditor() {
 
 	buffer.clear();
 	emit Mediator::instance() -> onBufferConnect(&buffer, nullptr);
+	emit Mediator::instance()->onHighlightReset();
 	polygonNumber = Polygon::get_polygons_total();
 	clearNew();
 	editedPolygon = nullptr;

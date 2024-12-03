@@ -25,6 +25,8 @@ signals:
 	void onPolygonSave(Polygon *polygon, bool isNew);
 	void onEdgeSelect(Edge* edge);
 	void onVertexSelect(Vertex* vertex);
+	void onPointHighlight(QPointF point);
+	void onHighlightReset();
 
 	// void addNewVertex(QPoint *point);
 	// void editVertexMouse(int row);
@@ -48,10 +50,14 @@ protected:
 
 private slots:
 	void onBufferConnectReceived(QVector<QVector2D> *data, Polygon *editedP);
+	void resetHighlight();
+	void onPointHighlightReceived(QPointF point);
 
 private:
 	QVector<QVector2D> *bufferData = nullptr;
 	Polygon *edited;
+	QPointF pointH;
+	QLineF lineH;
 
 	// int draggingVertex =
 		// -1;			   // Index of dragged vertex (-1 if no vertex is dragged)

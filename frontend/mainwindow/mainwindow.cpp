@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->newPolygonBtn, &QPushButton::released, this,
 			&MainWindow::newPolygon);
 	// connect(ui->tree, &QTreeWidget::itemClicked, this, onIte);
-	connect(ui->tree, &QTreeWidget::itemDoubleClicked,
+	connect(ui->tree, &QTreeWidget::itemDoubleClicked, this,
 			[this](QTreeWidgetItem *item, [[maybe_unused]] int column) {
 				QUuid itemId = item->data(0, Qt::UserRole).value<QUuid>();
 				if (all_polygons.contains(itemId)) {
@@ -35,6 +35,23 @@ MainWindow::MainWindow(QWidget *parent)
 				} else {
 					// selectEdge(id);
 					emit Mediator::instance()->onEdgeSelect(&all_edges[itemId]);
+				}
+			});
+	connect(ui->tree, &QTreeWidget::itemSelectionChanged,
+			this, [this]() {
+				if (ui->editorDock->isVisible()) {
+					return;
+				}
+				emit Mediator::instance()->onHighlightReset();
+				auto* item = ui->tree->selectedItems()[0];
+				if (item->parent()) {
+					if (item->parent()->parent()) {
+						QUuid id = item->data(0, Qt::UserRole).value<QUuid>();
+						if (all_vertices.contains(id)) {
+							Vertex& v = all_vertices[id];
+							emit Mediator::instance()->onPointHighlight(QPointF(v.x(), v.y()));
+						}
+					}
 				}
 			});
 	connect(Mediator::instance(), &Mediator::onPolygonSave, this,

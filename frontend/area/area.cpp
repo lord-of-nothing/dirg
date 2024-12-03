@@ -11,6 +11,10 @@ Area::Area(QWidget *parent) : QWidget{parent} {
 	// &Area::onBufferConnectReceived); qWarning() << "constr";
 	connect(Mediator::instance(), &Mediator::onBufferConnect, this,
 			&Area::onBufferConnectReceived);
+	connect(Mediator::instance(), &Mediator::onHighlightReset, this,
+			&Area::resetHighlight);
+	connect(Mediator::instance(), &Mediator::onPointHighlight, this,
+			&Area::onPointHighlightReceived);
 
 	setMouseTracking(true); // For check mouse position
 }
@@ -61,27 +65,31 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 							 QPointF(nextV.x(), nextV.y()));
 		}
 	}
-	if (bufferData == nullptr || bufferData->size() == 0) {
-		return;
-	}
 
-	// brush.setColor(Qt::red);
-	painter.setBrush(Qt::red);
-	painter.setPen(Qt::red);
 
-	// for (const QVector2D &point : *bufferData) {
-	for (int i = 0; i < bufferData->size(); ++i) {
-		QVector2D point = bufferData[0][i];
-		QVector2D nextPoint;
-		if (i < bufferData->size() - 1) {
-			nextPoint = bufferData[0][i + 1];
-		} else {
-			nextPoint = bufferData[0][0];
+	if (!(bufferData == nullptr || bufferData->size() == 0)) {
+		painter.setBrush(Qt::red);
+		painter.setPen(Qt::red);
+
+		for (int i = 0; i < bufferData->size(); ++i) {
+			QVector2D point = bufferData[0][i];
+			QVector2D nextPoint;
+			if (i < bufferData->size() - 1) {
+				nextPoint = bufferData[0][i + 1];
+			} else {
+				nextPoint = bufferData[0][0];
+			}
+			painter.drawEllipse(QPointF(point.x(), point.y()), 3.0, 3.0);
+			painter.drawLine(QPointF(point.x(), point.y()),
+							 QPointF(nextPoint.x(), nextPoint.y()))	;
 		}
-		painter.drawEllipse(QPointF(point.x(), point.y()), 3.0, 3.0);
-		painter.drawLine(QPointF(point.x(), point.y()),
-						 QPointF(nextPoint.x(), nextPoint.y()));
 	}
+	painter.setBrush(Qt::blue);
+	painter.setPen(Qt::blue);
+	if (pointH.x() != -1) {
+		painter.drawEllipse(pointH, 5.0, 5.0);
+	}
+
 	painter.end();
 }
 
@@ -149,4 +157,18 @@ void Area::onBufferConnectReceived(QVector<QVector2D> *data, Polygon *editedP) {
 	edited = editedP;
 	repaint();
 	// qWarning() << "signal";
+}
+
+void Area::resetHighlight() {
+	pointH.setX(-1);
+	pointH.setY(-1);
+	lineH.setP1(QPointF(0, 0));
+	lineH.setP2(QPointF(0, 0));
+	repaint();
+}
+
+void Area::onPointHighlightReceived(QPointF point) {
+	resetHighlight();
+	pointH = point;
+	repaint();
 }
