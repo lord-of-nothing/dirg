@@ -12,7 +12,7 @@
 #include <QStringList>
 #include <QVector>
 
-QVector<QString> materials{"1", "2", "3"};
+QVector<QString> properties{"1", "2", "3"};
 
 Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 	// widget setup
@@ -20,6 +20,9 @@ Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 	dock = qobject_cast<QDockWidget *>(parentWidget());
 	vtable = ui->vertexTable;
 	etable = ui->edgeTable;
+
+	// polygon properties setup
+	ui->polygonMaterial->addItems(properties);
 
 	// vertexTable setUp
 	vtable->setColumnCount(5);
@@ -52,26 +55,8 @@ Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 				  "QDoubleSpinBox { border: 1px solid gray; border-radius: "
 				  "4px; padding: 2px 4px; }");
 
-	// connect(etable, &QTableWidget::itemSelectionChanged, this,
-	// 		[this] () {
-	// 			auto selection = etable->selectedItems();
-	// 			if (selection.empty()) {
-	// 				emit Mediator::instance()->onHighlightReset();
-	// 				return;
-	// 			}
-	// 			int row = selection.first()->row();
-	// 			QPointF v1;
-	// 			v1.setX(qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 1))->value());
-	// 			v1.setY(qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(row, 2))->value());
-	// 			int next_row = (row + 1) % etable->rowCount();
-	// 			QPointF v2;
-	// 			v2.setX(qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(next_row, 1))->value());
-	// 			v2.setY(qobject_cast<QDoubleSpinBox*>(vtable->cellWidget(next_row, 2))->value());
-	// 			emit Mediator::instance()->onLineHighlight(QLineF(v1, v2));
-	// 		});
-
 	// vertex table empty row setup
-vtable->insertRow(0);
+	vtable->insertRow(0);
 	QLineEdit *nameEdit = new QLineEdit(this);
 	nameEdit->setPlaceholderText("V" + QString::number(polygonNumber) + "_" +
 								 QString::number(0));
@@ -127,15 +112,15 @@ vtable->insertRow(0);
 void Editor::load() {
 	// testing polygon
 	// triangle
-	addVRow(0, "V0_0", 0.0, 0.0);
-	addVRow(1, "V0_1", 700.0, 500.0);
-	addVRow(2, "V0_2", 900.0, 100.0);
+	addVRow(0, "V" + QString::number(polygonNumber) + "_0", 0.0, 0.0);
+	addVRow(1, "V" + QString::number(polygonNumber) + "_1", 700.0, 500.0);
+	addVRow(2, "V" + QString::number(polygonNumber) + "_2", 900.0, 100.0);
 	savePolygon();
 	// square
-	addVRow(0, "V1_0", 100.0, 100.0);
-	addVRow(1, "V1_1", 100.0, 400.0);
-	addVRow(2, "V1_2", 400.0, 400.0);
-	addVRow(3, "V1_3", 400.0, 100.0);
+	addVRow(0, "V" + QString::number(polygonNumber) + "_0", 100.0, 100.0);
+	addVRow(1, "V" + QString::number(polygonNumber) + "_1", 100.0, 400.0);
+	addVRow(2, "V" + QString::number(polygonNumber) + "_2", 400.0, 400.0);
+	addVRow(3, "V" + QString::number(polygonNumber) + "_3", 400.0, 100.0);
 	savePolygon();
 	ui->loadBtn->hide();
 }
@@ -198,7 +183,7 @@ void Editor::addVRow(int row, QString vName, double x, double y) {
 	edgeNameEdit->setText(defaultEdgeName);
 	etable->setCellWidget(row, 0, edgeNameEdit);
 	QComboBox *materialCombo = new QComboBox(this);
-	materialCombo->addItems(materials);
+	materialCombo->addItems(properties);
 	etable->setCellWidget(row, 1, materialCombo);
 	buffer.append(QVector2D(x, y));
 }
@@ -331,9 +316,65 @@ void Editor::onBufferConnect() {
 }
 
 void Editor::savePolygon() {
+	QLabel* errorBar = ui->errorBar;
 	if (etable->rowCount() < 3) {
+		errorBar->setText("Not enough vertices");
 		return;
 	}
+
+	QVector<QString> vNames;
+	QVector<QPair<double, double>> vCoords;
+	for (int row = 0; row < vtable->rowCount() - 1; ++row) {
+		QString vName = qobject_cast<QLineEdit*>(vtable->cellWidget(row, 0))->text();
+		double x =
+			qobject_cast<QDoubleSpinBox *>(vtable->cellWidget(row, 1))->value();
+		double y =
+			qobject_cast<QDoubleSpinBox *>(vtable->cellWidget(row, 2))->value();
+		vNames.append(vName);
+		vCoords.emplaceBack(x, y);
+	}
+	// CHECKS
+	// уникальность имён и координат вершин внутри полигона
+	QSet<QString> vNameCheck;
+	QSet<QPair<double, double>> vCoordCheck;
+	for (int row = 0; row < vtable->rowCount() - 1; ++row) {
+		if (vNameCheck.contains(vNames[row])) {
+			errorBar->setText("Duplicate vertex name within the polygon");
+			return;
+		}
+		if (vCoordCheck.contains(vCoords[row])) {
+			errorBar->setText("Identical vertices within the polygon");
+			return;
+		}
+		vNameCheck.insert(vNames[row]);
+		vCoordCheck.insert(vCoords[row]);
+	}
+	// выпуклость (и впуклость)
+	bool convex = isConvex(vCoords);
+	if (!convex) {
+		errorBar->setText("Polygon should be convex");
+		return;
+	}
+	// уникальность имён рёбер
+	QVector<QString> eNames;
+	for (int row = 0; row < etable->rowCount(); ++row) {
+		QString ename =
+			qobject_cast<QLineEdit *>(etable->cellWidget(row, 0))->text();
+		if (ename == "") {
+			ename = "E" + QString::number(polygonNumber) + "_" +
+					QString::number(row);
+		}
+		eNames.append(ename);
+	}
+	QSet<QString> eNameCheck;
+	for (int row = 0; row < etable->rowCount(); ++row) {
+		if (eNameCheck.contains(eNames[row])) {
+			errorBar->setText("Duplicate edge name within the polygon");
+			return;
+		}
+		eNameCheck.insert(eNames[row]);
+	}
+
 	QString name = "P" + QString::number(polygonNumber);
 	QUuid id;
 	if (editedPolygon != nullptr) {
@@ -348,33 +389,20 @@ void Editor::savePolygon() {
 
 	// создаём точки
 	for (int row = 0; row < etable->rowCount(); ++row) {
-		QString vname =
-			qobject_cast<QLineEdit *>(vtable->cellWidget(row, 0))->text();
-		double x =
-			qobject_cast<QDoubleSpinBox *>(vtable->cellWidget(row, 1))->value();
-		double y =
-			qobject_cast<QDoubleSpinBox *>(vtable->cellWidget(row, 2))->value();
-		Vertex v(x, y, vname);
+		Vertex v(vCoords[row].first, vCoords[row].second, vNames[row]);
 		vertices.append(v.id());
 	}
 
 	// создаём рёбра
 	for (int row = 0; row < etable->rowCount(); ++row) {
-		QString ename =
-			qobject_cast<QLineEdit *>(etable->cellWidget(row, 0))->text();
-		if (ename == "") {
-			ename = "E" + QString::number(polygonNumber) + "_" +
-					QString::number(row);
-		}
 		int property = qobject_cast<QComboBox *>(etable->cellWidget(row, 1))
 						   ->currentText()
 						   .toInt();
-		Edge e(vertices[row], vertices[(row + 1) % etable->rowCount()], ename,
+		Edge e(vertices[row], vertices[(row + 1) % etable->rowCount()], eNames[row],
 			   property);
 		edges.append(e.id());
 	}
 
-	// где-то здесь должна быть проверка корректности
 
 	// создаём полигон
 	Polygon *p = new Polygon(vertices, edges, name, 1, polygonNumber, id);
@@ -402,6 +430,7 @@ void Editor::resetEditor() {
 	polygonNumber = Polygon::get_polygons_total();
 	clearNew();
 	editedPolygon = nullptr;
+	ui->errorBar->setText("");
 	dock->close();
 }
 
@@ -434,13 +463,13 @@ void Editor::setupExistingPolygon(Polygon *polygon) {
 		auto eId = polygon->edges[i];
 		Edge &e = all_edges[eId];
 		QString eName = e.name();
-		QString material = QString::number(e.get_property());
+		QString property = QString::number(e.get_property());
 		// auto material = e.get_property();
 
 		qobject_cast<QLineEdit *>(etable->cellWidget(i, 0))
 			->setText(eName);
 		QComboBox* cbox = qobject_cast<QComboBox *>(etable->cellWidget(i, 1));
-		int idx = cbox->findText(material);
+		int idx = cbox->findText(property);
 		cbox->setCurrentIndex(idx);
 		dock->show();
 		emit Mediator::instance() -> onBufferConnect(&buffer, polygon);
