@@ -102,7 +102,7 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 void Area::mousePressEvent(QMouseEvent *event) {
 	if (event->button() == Qt::LeftButton) {
 		auto pos = mapFromGlobal(event->globalPosition().toPoint());
-		auto candidates = find_polygons_by_point(pos.x(), pos.y());
+		auto candidates = find_polygons_by_point({pos.x(), pos.y()});
 		if (candidates.size() == 0) {
 			// emit Mediator::instance()
 				// -> addNewVertex(&pos); // If we have not selected any polygon,
@@ -182,5 +182,9 @@ void Area::onPointHighlightReceived(QPointF point) {
 void Area::onLineHighlightReceived(QLineF line) {
 	resetHighlight();
 	lineH = line;
+	repaint();
+}
+
+void Area::onAreaRepaintReceived() {
 	repaint();
 }

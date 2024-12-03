@@ -20,6 +20,7 @@ signals:
     void polygonAdd(Polygon* polygon);
 #endif
 	void onBufferConnect(QVector<QVector2D> *data, Polygon *editedP);
+	void onAreaRepaint();
 	void onPolygonSelect(Polygon *polygon);
 	void onEditorReset();
 	void onPolygonSave(Polygon *polygon, bool isNew);
@@ -54,6 +55,7 @@ private slots:
 	void resetHighlight();
 	void onPointHighlightReceived(QPointF point);
 	void onLineHighlightReceived(QLineF line);
+	void onAreaRepaintReceived();
 
 private:
 	QVector<QVector2D> *bufferData = nullptr;

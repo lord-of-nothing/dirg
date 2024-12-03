@@ -1,4 +1,5 @@
 #include "vertex.h"
+#include "geometry.h"
 
 QUuid Vertex::gen_uuid() {
 	QUuid uuid_str = QUuid::createUuid();
@@ -12,6 +13,7 @@ Vertex::Vertex(const double x, const double y, const QString &name)
 	: x_(x), y_(y), name_(name) {
 	id_ = gen_uuid();
 	all_vertices[id_] = *this;
+	all_names.insert(name);
 }
 
 #if DELETE_VERTEX

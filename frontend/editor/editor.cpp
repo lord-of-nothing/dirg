@@ -351,7 +351,7 @@ void Editor::savePolygon() {
 		vCoordCheck.insert(vCoords[row]);
 	}
 	// выпуклость (и впуклость)
-	bool convex = isConvex(vCoords);
+	bool convex = checkConvex(vCoords);
 	if (!convex) {
 		errorBar->setText("Polygon should be convex");
 		return;

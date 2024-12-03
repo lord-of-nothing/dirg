@@ -3,6 +3,8 @@
 #include "editor.h"
 
 #include <QPalette>
+#include <QAction>
+#include <QMenu>
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -60,6 +62,28 @@ MainWindow::MainWindow(QWidget *parent)
 							emit Mediator::instance()->onLineHighlight(QLineF(QPointF(v1.x(), v1.y()),
 																				QPointF(v2.x(), v2.y())));
 						}
+					}
+				}
+			});
+
+	// context menu
+	connect(ui->tree, &QTreeWidget::customContextMenuRequested, this,
+			[this] (const QPoint& pos) {
+				auto* item = ui->tree->itemAt(pos);
+				if (item) {
+					if (!item->parent()) {
+						QMenu contextMenu;
+						QUuid id = item->data(0, Qt::UserRole).value<QUuid>();
+
+						QAction *deletePolygonAction = contextMenu.addAction("Delete");
+						connect(deletePolygonAction, &QAction::triggered, this,
+								[this, id] () { all_polygons[id].delete_polygon();
+									removePolygon(id);
+					emit Mediator::instance()->onEditorReset();
+								// emit Mediator::instance()->onAreaRepaint();
+								});
+
+						contextMenu.exec(ui->tree->viewport()->mapToGlobal(pos));
 					}
 				}
 			});

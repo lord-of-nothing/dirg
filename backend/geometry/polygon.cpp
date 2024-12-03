@@ -1,6 +1,7 @@
 #include "polygon.h"
 #include "edge.h"
 #include "vertex.h"
+#include "geometry.h"
 
 QUuid Polygon::gen_uuid() {
 	QUuid uuid_str = QUuid::createUuid();
@@ -12,11 +13,12 @@ QUuid Polygon::gen_uuid() {
 
 Polygon::Polygon(const QVector<QUuid> &vertices, const QVector<QUuid> &edges,
 				 const QString &name, const int material,
-				 const int existingNumber, const QUuid &existingId)
+				 const int existingNumber, const QUuid &existingId, const int layer)
 	: edges(edges), vertices(vertices), name_(name),
-	  cur_polygon_number_(existingNumber), material_(material) {
+	  cur_polygon_number_(existingNumber), material_(material), layer_(layer) {
 	id_ = (existingId.isNull()) ? gen_uuid() : existingId;
 	all_polygons[id_] = *this;
+	all_names.insert(name);
 
 	for (auto &edge : edges) {
 		all_edges[edge].add_polygon(id_);

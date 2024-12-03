@@ -1,5 +1,6 @@
 #include "edge.h"
 #include "vertex.h"
+#include "geometry.h"
 
 QUuid Edge::gen_uuid() {
 	QUuid uuid_str = QUuid::createUuid();
@@ -16,4 +17,5 @@ Edge::Edge(const QUuid &start, const QUuid &finish, const QString &name,
 	all_edges[id_] = *this;
 	all_vertices[start].add_edge(id_);
 	all_vertices[finish].add_edge(id_);
+	all_names.insert(name);
 }

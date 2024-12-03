@@ -12,12 +12,13 @@ public:
 	Polygon() = default;
 	Polygon(const QVector<QUuid> &v, const QVector<QUuid> &e,
 			const QString &name, const int material,
-			const int existingNumber = -1, const QUuid &existingId = QUuid());
+			const int existingNumber = -1, const QUuid &existingId = QUuid(), const int layer = 0);
 
 	static QUuid gen_uuid();
 	inline auto id() const { return id_; }
 	inline auto &name() const { return name_; }
 	inline auto number() const { return cur_polygon_number_; }
+	inline auto layer() const { return layer_; }
 	inline auto material() const { return material_; }
 
 	auto &next_vertex(const QUuid &current_vertex) const;
@@ -39,6 +40,7 @@ private:
 	int cur_polygon_number_;
 	[[maybe_unused]] int material_;
 	QUuid id_;
+	int layer_;
 };
 
 inline QHash<QUuid, Polygon> all_polygons;
