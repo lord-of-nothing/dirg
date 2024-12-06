@@ -62,6 +62,7 @@ private:
 	Polygon *edited;
 	QPointF pointH;
 	QLineF lineH;
+	const int coordOffset = 20;
 
 	// int draggingVertex =
 		// -1;			   // Index of dragged vertex (-1 if no vertex is dragged)

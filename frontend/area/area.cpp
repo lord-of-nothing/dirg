@@ -25,6 +25,7 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 	// qWarning() << "paint";
 	QPainter painter(this);
 	painter.begin(this);
+	painter.translate(coordOffset, coordOffset);
 	painter.setRenderHint(QPainter::Antialiasing);
 
 	QBrush brush(Qt::black, Qt::SolidPattern);
@@ -102,7 +103,7 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 void Area::mousePressEvent(QMouseEvent *event) {
 	if (event->button() == Qt::LeftButton) {
 		auto pos = mapFromGlobal(event->globalPosition().toPoint());
-		auto candidates = find_polygons_by_point({pos.x(), pos.y()});
+		auto candidates = find_polygons_by_point({pos.x() - coordOffset, pos.y() - coordOffset});
 		if (candidates.size() == 0) {
 			// emit Mediator::instance()
 				// -> addNewVertex(&pos); // If we have not selected any polygon,
