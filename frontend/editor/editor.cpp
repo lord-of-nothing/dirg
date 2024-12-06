@@ -435,6 +435,7 @@ void Editor::resetEditor() {
 	buffer.clear();
 	emit Mediator::instance() -> onBufferConnect(&buffer, nullptr);
 	emit Mediator::instance()->onHighlightReset();
+	emit Mediator::instance()->onEditingExit();
 	polygonNumber = Polygon::get_polygons_total();
 	ui->polygonNameEdit->setText("");
 	ui->polygonNameEdit->setPlaceholderText("P" + QString::number(polygonNumber));
@@ -444,12 +445,9 @@ void Editor::resetEditor() {
 }
 
 void Editor::onPolygonSelectReceived(Polygon *polygon) {
-	// dock->show();
-	// if (polygon == editedPolygon) {
-		// dock->show();
-		// emit Mediator::instance() -> onBufferConnect(&buffer, polygon);
-		// return;
-	// }
+	if (editedPolygon != nullptr) {
+		return;
+	}
 	resetEditor();
 	setupExistingPolygon(polygon);
 }

@@ -19,6 +19,10 @@ public:
 	void removePolygon(QUuid id);
 	~MainWindow();
 
+private slots:
+	void onPolygonSelectReceived();
+	void onEditingExitReceived();
+
 private:
 	Ui::MainWindow *ui;
 	void newPolygon();

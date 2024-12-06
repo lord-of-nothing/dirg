@@ -12,6 +12,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 	ui->editorDock->setWidget(new Editor(ui->editorDock)); // ?? -- а что не так?
 
+	connect(Mediator::instance(), &Mediator::onPolygonSelect, this, &MainWindow::onPolygonSelectReceived);
+	connect(Mediator::instance(), &Mediator::onEditorReset, this, &MainWindow::onEditingExitReceived);
+
 	connect(ui->editorDock, &QDockWidget::visibilityChanged, this, [this]() {
 		if (!ui->editorDock->isVisible()) {
 			emit Mediator::instance() -> onEditorReset();
@@ -124,6 +127,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::newPolygon() {
 	emit Mediator::instance() -> onEditorReset();
+	ui->tree->setEnabled(false);
 	ui->editorDock->show();
 }
 
@@ -163,6 +167,14 @@ void MainWindow::removePolygon(QUuid id) {
 			return;		 // После удаления выходим
 		}
 	}
+}
+
+void MainWindow::onPolygonSelectReceived() {
+	ui->tree->setEnabled(false);
+}
+
+void MainWindow::onEditingExitReceived() {
+	ui->tree->setEnabled(true);
 }
 
 void MainWindow::selectPolygon(QUuid id) {

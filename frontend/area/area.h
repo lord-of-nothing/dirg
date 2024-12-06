@@ -29,6 +29,7 @@ signals:
 	void onPointHighlight(QPointF point);
 	void onLineHighlight(QLineF line);
 	void onHighlightReset();
+	void onEditingExit();
 
 	// void addNewVertex(QPoint *point);
 	// void editVertexMouse(int row);
