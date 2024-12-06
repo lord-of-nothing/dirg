@@ -11,6 +11,7 @@
 #include <QStackedLayout>
 #include <QStringList>
 #include <QVector>
+#include <QMessageBox>
 
 QVector<QString> properties{"1", "2", "3"};
 
@@ -317,9 +318,8 @@ void Editor::onBufferConnect() {
 }
 
 void Editor::savePolygon() {
-	QLabel* errorBar = ui->errorBar;
 	if (etable->rowCount() < 3) {
-		errorBar->setText("Not enough vertices");
+		QMessageBox::warning(this, "Incorrect input", "Not enough vertices");
 		return;
 	}
 
@@ -340,11 +340,11 @@ void Editor::savePolygon() {
 	QSet<QPair<double, double>> vCoordCheck;
 	for (int row = 0; row < vtable->rowCount() - 1; ++row) {
 		if (vNameCheck.contains(vNames[row])) {
-			errorBar->setText("Duplicate vertex name within the polygon");
+			QMessageBox::warning(this, "Incorrect input", "Duplicate vertex name within the polygon");
 			return;
 		}
 		if (vCoordCheck.contains(vCoords[row])) {
-			errorBar->setText("Identical vertices within the polygon");
+			QMessageBox::warning(this, "Incorrect input", "Identical vertices within the polygon");
 			return;
 		}
 		vNameCheck.insert(vNames[row]);
@@ -353,7 +353,7 @@ void Editor::savePolygon() {
 	// выпуклость (и впуклость)
 	bool convex = checkConvex(vCoords);
 	if (!convex) {
-		errorBar->setText("Polygon should be convex");
+		QMessageBox::warning(this, "Incorrect input", "Polygon should be convex");
 		return;
 	}
 	// уникальность имён рёбер
@@ -370,7 +370,7 @@ void Editor::savePolygon() {
 	QSet<QString> eNameCheck;
 	for (int row = 0; row < etable->rowCount(); ++row) {
 		if (eNameCheck.contains(eNames[row])) {
-			errorBar->setText("Duplicate edge name within the polygon");
+			QMessageBox::warning(this, "Incorrect input", "Duplicate edge name within the polygon");
 			return;
 		}
 		eNameCheck.insert(eNames[row]);
@@ -440,7 +440,6 @@ void Editor::resetEditor() {
 	ui->polygonNameEdit->setPlaceholderText("P" + QString::number(polygonNumber));
 	clearNew();
 	editedPolygon = nullptr;
-	ui->errorBar->setText("");
 	dock->close();
 }
 
