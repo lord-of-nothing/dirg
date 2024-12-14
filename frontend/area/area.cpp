@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QPointF>
 #include <QVector2D>
+#include <QPolygonF>
 
 Area::Area(QWidget *parent) : QWidget{parent} {
 	// connect(Mediator::instance(), &Mediator::bufferConnect, this,
@@ -22,35 +23,26 @@ Area::Area(QWidget *parent) : QWidget{parent} {
 }
 
 void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
-	// qWarning() << "paint";
 	QPainter painter(this);
 	painter.begin(this);
 	painter.translate(coordOffset, coordOffset);
 	painter.setRenderHint(QPainter::Antialiasing);
 
-	QBrush brush(Qt::black, Qt::SolidPattern);
-	QPen pen(Qt::black);
+	// рамка
+	// QBrush brush(Qt::transparent);
+	// QPen pen(Qt::gray, Qt::DotLine);
+	painter.setBrush(Qt::transparent);
+	painter.setPen(Qt::gray);
+	painter.drawPolygon({QPointF(0, 0),
+						QPointF(width() - coordOffset, 0),
+						QPointF(width() - coordOffset, height() - coordOffset),
+						QPointF(0, height() - coordOffset)});
 
-	// Настройка кисти для рисования точек
+	painter.setBrush(Qt::SolidPattern);
 	painter.setBrush(Qt::black);
 	painter.setPen(Qt::black);
-	// for (auto& [id, polygon] : all_polygons) {
-	//     if (edited == &polygon) {
-	//         continue;
-	//     }
-	//     QVector<QUuid>& vertices = polygon.get_vertices();
-	//     qWarning() << vertices.size();
-	//     for (int i = 0; i < vertices.size(); ++i) {
-	//         Vertex& curV = all_vertices[vertices[i]];
-	//         Vertex& nextV = all_vertices[vertices[(i + 1) %
-	//         vertices.size()]];
 
-	//         painter.drawEllipse(QPointF(curV.get_x(),
-	//         curV.get_y()), 3.0, 3.0); painter.drawLine(QPointF(curV.get_x(),
-	//         curV.get_y()), QPointF(nextV.get_x(), nextV.get_y()));
-	//     }
-	// }
-
+	// полигоны
 	for (auto polygons = all_polygons.begin(); polygons != all_polygons.end();
 		 ++polygons) {
 		Polygon &polygon = polygons.value();
@@ -69,7 +61,7 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 		}
 	}
 
-
+	// редактируемый полигон
 	if (!(bufferData == nullptr || bufferData->size() == 0)) {
 		painter.setBrush(Qt::red);
 		painter.setPen(Qt::red);
@@ -87,10 +79,14 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 							 QPointF(nextPoint.x(), nextPoint.y()))	;
 		}
 	}
+
+	// выделенный в дереве
 	painter.setBrush(Qt::blue);
-	pen.setColor(Qt::blue);
-	pen.setWidth(4.0);
-	painter.setPen(pen);
+	painter.setPen(Qt::blue);
+	painter.setPen(4.0);
+	// pen.setColor(Qt::blue);
+	// pen.setWidth(4.0);
+	// painter.setPen(pen);
 	if (pointH.x() != -1) {
 		painter.drawEllipse(pointH, 5.0, 5.0);
 	} else if (lineH.length()) {

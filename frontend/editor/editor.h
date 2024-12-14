@@ -46,28 +46,36 @@ private:
 	void updateTableSize();
 	// void addVertexRow(int row, QString vName, double x, double y);
 	void addVRow(int row, QString vName, double x, double y);
+
 	void saveVertex(int row);
 	void resetVertex(int row);
 	void finishEditVertex(int row);
 	void editVertex(int row);
+
+	void saveEdge(int row);
+	void resetEdge(int row);
+	void finishEditEdge(int row);
+	void editEdge(int row);
+
 	void clearNew();
 	void savePolygon();
 	void resetEditor();
 
 	Ui::Editor *ui;
 	QTableWidget *vtable;
-	QPushButton *cancelBtn = nullptr;
-	; // костыль
+	// QPushButton *cancelBtn = nullptr;
 	QTableWidget *etable;
-	QVector<QVector2D> buffer;
 	QDockWidget *dock;
-	MainWindow *mainWindow;
 	int polygonNumber;
 	Polygon *editedPolygon = nullptr;
 	QIcon addIcon = style()->standardIcon(QStyle::SP_DialogOkButton);
 	QIcon editIcon = style()->standardIcon(QStyle::SP_ArrowBack);
 	QIcon saveIcon = style()->standardIcon(QStyle::SP_DialogApplyButton);
 	QIcon resetIcon = style()->standardIcon(QStyle::SP_DialogCancelButton);
+
+	QVector<QVector2D> buffer;
+	QString editedEdgeName;
+	QString editedEdgeProperty;
 
 	const double minCoord = 0.0;
 	const double maxCoord = 1000.0;

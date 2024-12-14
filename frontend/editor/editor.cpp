@@ -38,8 +38,8 @@ Editor::Editor(QWidget *parent) : QWidget(parent), ui(new Ui::Editor) {
 	vtable->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
 	// edgeTable setUp
-	etable->setColumnCount(2);
-	etable->setHorizontalHeaderLabels(QStringList() << "Name" << "Property");
+	etable->setColumnCount(4);
+	etable->setHorizontalHeaderLabels(QStringList() << "Name" << "Property" << "" << "");
 	etable->horizontalHeader()->setSectionsClickable(false);
 	etable->horizontalHeader()->setSectionsMovable(false);
 	etable->horizontalHeader()->setStyleSheet("QHeaderView::section {"
@@ -184,10 +184,95 @@ void Editor::addVRow(int row, QString vName, double x, double y) {
 						  // заполняется текст?
 	edgeNameEdit->setText(defaultEdgeName);
 	etable->setCellWidget(row, 0, edgeNameEdit);
+	edgeNameEdit->setEnabled(false);
+
+
 	QComboBox *materialCombo = new QComboBox(this);
 	materialCombo->addItems(properties);
 	etable->setCellWidget(row, 1, materialCombo);
+	materialCombo->setEnabled(false);
+
+	QPushButton *edgeEditBtn = new QPushButton(this);
+	connect(edgeEditBtn, &QPushButton::released, this,
+			[this, row]() { editEdge(row); });
+	edgeEditBtn->setIcon(editIcon);
+	QPushButton *edgeSaveBtn = new QPushButton(this);
+	edgeSaveBtn->setIcon(saveIcon);
+	connect(edgeSaveBtn, &QPushButton::released, this,
+			[this, row]() { saveEdge(row); });
+
+	QWidget *edgeEditSaveStackW = new QWidget(this);
+	QStackedLayout *edgeEditSaveStack = new QStackedLayout(edgeEditSaveStackW);
+	edgeEditSaveStack->addWidget(edgeEditBtn);
+	edgeEditSaveStack->addWidget(edgeSaveBtn);
+	etable->setCellWidget(row, 2, edgeEditSaveStackW);
+
 	buffer.append(QVector2D(x, y));
+}
+
+void Editor::editEdge(int row) {
+	for (int i = 0; i < 2; ++i) {
+		etable->cellWidget(row, i)->setEnabled(true);
+	}
+	vtable->setEnabled(false);
+
+	QPushButton* cancelBtn = new QPushButton(this);
+	cancelBtn->setIcon(resetIcon);
+	connect(cancelBtn, &QPushButton::released, this, [this, row]() { resetEdge(row); });
+	etable->setCellWidget(row, 3, cancelBtn);
+
+	QStackedLayout *layout =
+		qobject_cast<QStackedLayout*>(etable->cellWidget(row, 2)->layout());
+	layout->setCurrentIndex(1);
+
+	for (int i = 0; i < etable->rowCount(); ++i) {
+		if (i != row) {
+			etable->cellWidget(i, 2)->setEnabled(false);
+		}
+	}
+
+	editedEdgeName = qobject_cast<QLineEdit*>(etable->cellWidget(row, 0))->text();
+	editedEdgeProperty = qobject_cast<QComboBox*>(etable->cellWidget(row, 1))->currentText();
+
+
+	QVector2D first_vertex = buffer[row];
+	QVector2D second_vertex = buffer[(row + 1) % buffer.size()];
+	QLineF edge_line({first_vertex[0], first_vertex[1]}, {second_vertex[0], second_vertex[1]});
+	emit Mediator::instance()->onLineHighlight(edge_line);
+}
+
+void Editor::saveEdge(int row) {
+	finishEditEdge(row);
+
+	QLineEdit* nameEdit = qobject_cast<QLineEdit*>(etable->cellWidget(row, 0));
+	if (nameEdit->text().isEmpty()) {
+		nameEdit->setText(nameEdit->placeholderText());
+	}
+}
+
+void Editor::resetEdge(int row) {
+	finishEditEdge(row);
+
+	qobject_cast<QLineEdit*>(etable->cellWidget(row, 0))->setText(editedEdgeName);
+	qobject_cast<QComboBox*>(etable->cellWidget(row, 1))->setCurrentText(editedEdgeProperty);
+}
+
+void Editor::finishEditEdge(int row) {
+	for (int i = 0; i < 2; ++i) {
+		etable->cellWidget(row, i)->setEnabled(false);
+	}
+	vtable->setEnabled(true);
+
+	etable->removeCellWidget(row, 3);
+	QStackedLayout *layout =
+		qobject_cast<QStackedLayout*>(etable->cellWidget(row, 2)->layout());
+	layout->setCurrentIndex(0);
+	for (int i = 0; i < etable->rowCount(); ++i) {
+		etable->cellWidget(i, 2)->setEnabled(true);
+	}
+
+
+	emit Mediator::instance()->onHighlightReset();
 }
 
 // Slot for add Vertex
@@ -216,8 +301,9 @@ void Editor::editVertex(int row) {
 	for (int i = 0; i < 3; ++i) {
 		vtable->cellWidget(row, i)->setEnabled(true);
 	}
+	etable->setEnabled(false);
 
-	cancelBtn = new QPushButton(this);
+	QPushButton* cancelBtn = new QPushButton(this);
 	cancelBtn->setIcon(resetIcon);
 	connect(cancelBtn, &QPushButton::released, this,
 			[this, row]() { resetVertex(row); });
@@ -264,10 +350,9 @@ void Editor::finishEditVertex(int row) {
 	for (int i = 0; i < 3; ++i) {
 		vtable->cellWidget(row, i)->setEnabled(false);
 	}
+	etable->setEnabled(true);
 
 	vtable->removeCellWidget(row, 4);
-	delete cancelBtn;
-	cancelBtn = nullptr;
 	QStackedLayout *layout =
 		qobject_cast<QStackedLayout *>(vtable->cellWidget(row, 3)->layout());
 	layout->setCurrentIndex(0);
@@ -299,8 +384,12 @@ void Editor::updateTableSize() {
 
 	// edge table
 	tableWidth = etable->width();
-	etable->setColumnWidth(0, tableWidth * 0.48);
-	etable->setColumnWidth(1, tableWidth * 0.48);
+	for (auto col = 0; col < 2; ++col) {
+		etable->setColumnWidth(col, tableWidth * 0.4);
+	}
+	for (auto col = 2; col < 4; ++col) {
+		etable->setColumnWidth(col, tableWidth * 0.08);
+	}
 }
 
 void Editor::showEvent([[maybe_unused]] QShowEvent *event) {
