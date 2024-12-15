@@ -28,6 +28,7 @@ signals:
 	void onVertexSelect(Vertex* vertex);
 	void onPointHighlight(QPointF point);
 	void onLineHighlight(QLineF line);
+	void onPolygonHighlight(Polygon* poly);
 	void onHighlightReset();
 	void onEditingExit();
 
@@ -57,10 +58,12 @@ private slots:
 	void onPointHighlightReceived(QPointF point);
 	void onLineHighlightReceived(QLineF line);
 	void onAreaRepaintReceived();
+	void onPolygonHighlightReceived(Polygon* poly);
 
 private:
 	QVector<QVector2D> *bufferData = nullptr;
 	Polygon *edited;
+	Polygon *highlighted;
 	QPointF pointH;
 	QLineF lineH;
 	const int coordOffset = 20;

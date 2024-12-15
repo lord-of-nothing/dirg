@@ -67,6 +67,9 @@ MainWindow::MainWindow(QWidget *parent)
 																				QPointF(v2.x(), v2.y())));
 						}
 					}
+				} else {
+					QUuid id = item->data(0, Qt::UserRole).value<QUuid>();
+					emit Mediator::instance()->onPolygonHighlight(&all_polygons[id]);
 				}
 			});
 
@@ -128,6 +131,7 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::newPolygon() {
 	emit Mediator::instance() -> onEditorReset();
 	ui->tree->setEnabled(false);
+	ui->tree->clearSelection();
 	ui->editorDock->show();
 }
 
@@ -171,6 +175,7 @@ void MainWindow::removePolygon(QUuid id) {
 
 void MainWindow::onPolygonSelectReceived() {
 	ui->tree->setEnabled(false);
+	ui->tree->clearSelection();
 }
 
 void MainWindow::onEditingExitReceived() {

@@ -18,6 +18,8 @@ Area::Area(QWidget *parent) : QWidget{parent} {
 			&Area::onPointHighlightReceived);
 	connect(Mediator::instance(), &Mediator::onLineHighlight, this,
 			&Area::onLineHighlightReceived);
+	connect(Mediator::instance(), &Mediator::onPolygonHighlight, this,
+			&Area::onPolygonHighlightReceived);
 
 	// setMouseTracking(true); // For check mouse position
 }
@@ -38,9 +40,10 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 						QPointF(width() - coordOffset, height() - coordOffset),
 						QPointF(0, height() - coordOffset)});
 
-	painter.setBrush(Qt::SolidPattern);
-	painter.setBrush(Qt::black);
-	painter.setPen(Qt::black);
+	QPen normalPen;
+	normalPen.setWidth(2.0);
+	normalPen.setColor(Qt::black);
+	painter.setPen(normalPen);
 
 	// полигоны
 	for (auto polygons = all_polygons.begin(); polygons != all_polygons.end();
@@ -63,8 +66,10 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 
 	// редактируемый полигон
 	if (!(bufferData == nullptr || bufferData->size() == 0)) {
-		painter.setBrush(Qt::red);
-		painter.setPen(Qt::red);
+		QPen editedPen;
+		editedPen.setWidth(4.0);
+		editedPen.setColor(Qt::red);
+		painter.setPen(editedPen);
 
 		for (int i = 0; i < bufferData->size(); ++i) {
 			QVector2D point = bufferData[0][i];
@@ -81,13 +86,25 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 	}
 
 	// выделенный в дереве
-	painter.setBrush(Qt::blue);
-	painter.setPen(Qt::blue);
-	painter.setPen(4.0);
-	// pen.setColor(Qt::blue);
-	// pen.setWidth(4.0);
-	// painter.setPen(pen);
-	if (pointH.x() != -1) {
+	QPen highlightPen;
+	highlightPen.setColor(Qt::blue);
+	highlightPen.setWidth(4.0);
+	painter.setPen(highlightPen);
+
+	if (highlighted != nullptr) {
+		for (auto& edgeId : highlighted->edges) {
+			Edge& edge = all_edges[edgeId];
+			Vertex& v1 = all_vertices[edge.coords().first];
+			Vertex& v2 = all_vertices[edge.coords().second];
+			QLineF line({v1.x(), v1.y()}, {v2.x(), v2.y()});
+			painter.drawLine(line);
+		}
+	}
+	else if (pointH.x() != -1) {
+		QBrush vertexBrush;
+		vertexBrush.setStyle(Qt::SolidPattern);
+		vertexBrush.setColor(Qt::blue);
+		painter.setBrush(vertexBrush);
 		painter.drawEllipse(pointH, 5.0, 5.0);
 	} else if (lineH.length()) {
 		painter.drawLine(lineH);
@@ -163,10 +180,17 @@ void Area::onBufferConnectReceived(QVector<QVector2D> *data, Polygon *editedP) {
 }
 
 void Area::resetHighlight() {
+	highlighted = nullptr;
 	pointH.setX(-1);
 	pointH.setY(-1);
 	lineH.setP1(QPointF(0, 0));
 	lineH.setP2(QPointF(0, 0));
+	repaint();
+}
+
+void Area::onPolygonHighlightReceived(Polygon* poly) {
+	resetHighlight();
+	highlighted = poly;
 	repaint();
 }
 
