@@ -31,14 +31,31 @@ void Area::paintEvent([[maybe_unused]] QPaintEvent *event) {
 	painter.setRenderHint(QPainter::Antialiasing);
 
 	// рамка
-	// QBrush brush(Qt::transparent);
-	// QPen pen(Qt::gray, Qt::DotLine);
-	painter.setBrush(Qt::transparent);
-	painter.setPen(Qt::gray);
-	painter.drawPolygon({QPointF(0, 0),
-						QPointF(width() - coordOffset, 0),
-						QPointF(width() - coordOffset, height() - coordOffset),
-						QPointF(0, height() - coordOffset)});
+	QPen axisPen;
+	axisPen.setColor(Qt::gray);
+	axisPen.setWidth(1);
+	painter.setPen(axisPen);
+	// painter.drawPolygon({QPointF(0, 0),
+						// QPointF(width() - coordOffset, 0),
+						// QPointF(width() - coordOffset, height() - coordOffset),
+						// QPointF(0, height() - coordOffset)});
+	painter.drawLine(QPointF(0, 0), QPointF(width() + coordOffset, 0));
+	painter.drawLine(QPointF(0, 0), QPointF(0, height() + coordOffset));
+
+	// точки на осях
+	QFont axisFont;
+	axisFont.setPointSize(8);
+	painter.setFont(axisFont);
+	int tickStep = 100;
+	int tickHalfSize = 5;
+	for (int curTick = 0; curTick < width(); curTick += tickStep) {
+		painter.drawLine(curTick, -tickHalfSize, curTick, tickHalfSize);
+		painter.drawText(curTick, -tickHalfSize, QString::number(curTick));
+	}
+	for (int curTick = tickStep; curTick < height(); curTick += tickStep) {
+		painter.drawLine(-tickHalfSize, curTick, tickHalfSize, curTick);
+		painter.drawText(-coordOffset, curTick + tickHalfSize, QString::number(curTick));
+	}
 
 	QPen normalPen;
 	normalPen.setWidth(2.0);
