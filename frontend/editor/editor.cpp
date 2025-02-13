@@ -114,16 +114,16 @@ void Editor::load() {
 	// testing polygon
 	// triangle
 	resetEditor();
-	addVRow(0, "V" + QString::number(polygonNumber) + "_0", 0.0, 0.0);
+	addVRow(0, "V" + QString::number(polygonNumber) + "_0", 300.0, 0.0);
 	addVRow(1, "V" + QString::number(polygonNumber) + "_1", 700.0, 500.0);
-	addVRow(2, "V" + QString::number(polygonNumber) + "_2", 900.0, 100.0);
+	addVRow(2, "V" + QString::number(polygonNumber) + "_2", 900.0, 200.0);
 	savePolygon();
 	// square
-	addVRow(0, "V" + QString::number(polygonNumber) + "_0", 100.0, 100.0);
-	addVRow(1, "V" + QString::number(polygonNumber) + "_1", 100.0, 400.0);
-	addVRow(2, "V" + QString::number(polygonNumber) + "_2", 400.0, 400.0);
-	addVRow(3, "V" + QString::number(polygonNumber) + "_3", 400.0, 100.0);
-	savePolygon();
+	// addVRow(0, "V" + QString::number(polygonNumber) + "_0", 100.0, 100.0);
+	// addVRow(1, "V" + QString::number(polygonNumber) + "_1", 100.0, 400.0);
+	// addVRow(2, "V" + QString::number(polygonNumber) + "_2", 400.0, 400.0);
+	// addVRow(3, "V" + QString::number(polygonNumber) + "_3", 400.0, 100.0);
+	// savePolygon();
 	ui->loadBtn->hide();
 }
 
